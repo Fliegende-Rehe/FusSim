@@ -1,10 +1,10 @@
 from asyncio import gather, create_task, run
+from random import uniform
 
 from .fusion import *
 from .link import Link
 
-
-SPEED = 10.0  # 0.075
+SPEED = 6.0  # 0.075
 LOG_PRESISION = 3
 TIME_TO_CATCH_BREATH = 1
 
@@ -28,13 +28,13 @@ class Robot:
         async def async_drive():
             tasks = []
             for index, (lnk, tar) in enumerate(zip(self.links, target)):
-                range = tar - current[index]
-                rotation_direction = 1 if range > 0 else -1
-                link_is_ready[index] = abs(range) < speed[index]
+                rng = tar - current[index]
+                rotation_direction = 1 if rng > 0 else -1
+                link_is_ready[index] = abs(rng) < speed[index]
                 if link_is_ready[index]:
                     continue
                 step = speed[index] if abs(
-                    range) >= speed[index] else abs(range)
+                    rng) >= speed[index] else abs(rng)
                 current[index] += rotation_direction * step
                 if not lnk.fit_limits(current[index]):
                     break
@@ -44,7 +44,8 @@ class Robot:
 
         current = self.get_links_positions()
         ranges = [abs(tar - cur) for tar, cur in zip(target, current)]
-        speed = [rng * SPEED / max(ranges) for rng in ranges]
+        max_time = max(ranges) / SPEED
+        speed = [rng / max_time for rng in ranges]
         link_is_ready = [False] * len(self.links)
         while not all(link_is_ready):
             run(async_drive())
@@ -56,3 +57,6 @@ class Robot:
 
     def get_links_positions(self, presision=10):
         return [round(lnk.get_position(), presision) for lnk in self.links]
+
+    def set_random_position(self):
+        self.drive([uniform(lnk.min, lnk.max) for lnk in self.links])

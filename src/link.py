@@ -3,6 +3,8 @@ from math import radians, degrees
 from .fusion import *
 
 
+# import numpy as np
+
 class Link:
     def __init__(self, joint, constraints):
         self.joint = joint
@@ -10,7 +12,8 @@ class Link:
 
         self.min, self.max = constraints['limits']
         self.length = constraints['length']
-        self.home = constraints['home']
+        self.home = constraints['home_position']
+        self.rotation_axis = constraints['rotation_axis']
 
         self.set_limits()
 

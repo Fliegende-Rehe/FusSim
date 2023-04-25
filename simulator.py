@@ -1,42 +1,36 @@
-import traceback
-from random import uniform
-
-from .src.robot import Robot
 from .src.fusion import *
+from .src.robotic_cell import *
 
 PROJECT_NAME = 'gets'
 FILE_NAME = 'simulation'
-EXTERNAL_MODULES_PATH = 'C:/fusion/py39_fusion/Lib/site-packages'
 
-ABB_IRB2600_CONSTRAINS = [
-    {'limits': [-168.0, 168.0], 'length': 215.0, 'home': 0.0},
-    {'limits': [-120.0, 120.0], 'length': 700.0, 'home': 0.0},
-    {'limits': [-180.0, 65.0], 'length': 287.0, 'home': 0.0},
-    {'limits': [-180.0, 180.0], 'length': 508.0, 'home': 0.0},
-    {'limits': [-125.0, 125.0], 'length': 0.0, 'home': 0.0},
-    {'limits': [-180.0, 180.0], 'length': 600, 'home': -90.0},
+ABB_IRB2600 = [
+    {'limits': [-168, 168], 'length': 215, 'home_position': 0, 'rotation_axis': 'x'},
+    {'limits': [-120, 120], 'length': 700, 'home_position': 0, 'rotation_axis': 'x'},
+    {'limits': [-180, 65], 'length': 287, 'home_position': 0, 'rotation_axis': 'x'},
+    {'limits': [-180, 180], 'length': 508, 'home_position': 0, 'rotation_axis': 'x'},
+    {'limits': [-125, 125], 'length': 0, 'home_position': 0, 'rotation_axis': 'x'},
+    {'limits': [-180, 180], 'length': 600, 'home_position': -90, 'rotation_axis': 'x'}
 ]
-KP3_V2H_CONSTRAINS = [
-    {'limits': [0.0, 0.0], 'length': 0.0, 'home': 0.0},
-    {'limits': [0.0, 0.0], 'length': 0.0, 'home': 0.0},
-    {'limits': [0.0, 0.0], 'length': 0.0, 'home': 0.0},
+
+KP3_V2H500_2 = [
+    {'limits': [-180, 180], 'length': 215, 'home_position': 0, 'rotation_axis': 'z'},
+    {'limits': [-180, 180], 'length': 800, 'home_position': 0, 'rotation_axis': 'y'},
+    {'limits': [-180, 180], 'length': 1500, 'home_position': 0, 'rotation_axis': 'y'},
 ]
 
 
 def run(context):
     try:
-        fusion = Fusion(PROJECT_NAME, FILE_NAME, EXTERNAL_MODULES_PATH)
+        fusion = Fusion(PROJECT_NAME, FILE_NAME)
 
         assembly = fusion.get_assembly()
 
-        abb_irb2600 = Robot(
-            assembly.get_component('ABB_IRB2600'), ABB_IRB2600_CONSTRAINS
-        )
+        robot_cell = RoboticCell(assembly, ABB_IRB2600, KP3_V2H500_2)
 
-        abb_irb2600.launch()
-
-        abb_irb2600.drive([uniform(lnk.min, lnk.max) for lnk in abb_irb2600.links])
+        robot_cell.set_random_position()
 
         kill()
+
     except:
         messenger(f'Error in run\n{traceback.format_exc()}')

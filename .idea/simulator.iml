@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module type="PYTHON_MODULE" version="4">
+  <component name="FacetManager">
+    <facet type="fusion360plugin" name="Fusion 360 Support">
+      <configuration>
+        <option name="fusionPath" value="C:\Users\Admin\AppData\Local\Autodesk\webdeploy\production\22e664d43fce268ac9bf1fa1cda69e4a9585c997\Fusion360.exe" />
+      </configuration>
+    </facet>
+  </component>
+  <component name="NewModuleRootManager">
+    <content url="file://$MODULE_DIR$">
+      <excludeFolder url="file://$MODULE_DIR$/venv" />
+    </content>
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="module-library" scope="PROVIDED">
+      <library name="Fusion 360 API" type="python">
+        <CLASSES>
+          <root url="file://$USER_HOME$/AppData/Local/Autodesk/webdeploy/production/22e664d43fce268ac9bf1fa1cda69e4a9585c997/Api/Python/packages/adsk/defs" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+  </component>
+</module>

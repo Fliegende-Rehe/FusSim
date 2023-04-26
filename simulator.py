@@ -1,5 +1,5 @@
-from .src.fusion import *
 from .src.robotic_cell import *
+from .src.fusion import *
 
 PROJECT_NAME = 'gets'
 FILE_NAME = 'simulation'
@@ -28,7 +28,9 @@ def run(context):
 
         robot_cell = RoboticCell(assembly, ABB_IRB2600, KP3_V2H500_2)
 
-        robot_cell.set_random_position()
+        robot_cell.launch()
+
+        robot_cell.set_random_position(12.0)
 
         kill()
 

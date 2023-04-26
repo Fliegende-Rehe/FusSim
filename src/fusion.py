@@ -58,10 +58,6 @@ def kill(*objs_to_check):
     if objs_to_check:
         messenger(f"Check {objs_to_check}")
     logger('Terminate session')
-    try:
-        sys.exit('Session is terminated by kill')
-    except:
-        traceback.print_exc(file=sys.stdout)
 
 
 def refresh():

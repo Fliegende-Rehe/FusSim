@@ -1,8 +1,8 @@
-from asyncio import create_task, gather, run
-from typing import List, Tuple
-
 from .fusion import refresh, logger
 from .link import Link
+
+from asyncio import create_task, gather
+from typing import List
 
 LOG_PRECISION = 3
 

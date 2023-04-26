@@ -1,0 +1,9 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="simulator" type="Fusion360PythonScript" factoryName="Fusion 360 Python Script" nameIsGenerated="true">
+    <module name="simulator" />
+    <option name="script" value="C:\Workspace\simulator\simulator.py" />
+    <option name="sdkHome" value="" />
+    <option name="useModuleSdk" value="false" />
+    <method v="2" />
+  </configuration>
+</component>

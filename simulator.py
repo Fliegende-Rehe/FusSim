@@ -1,5 +1,8 @@
 from .src.robotic_cell import *
+from .src.part import *
 from .src.fusion import *
+
+import traceback
 
 PROJECT_NAME = 'gets'
 FILE_NAME = 'simulation'
@@ -29,6 +32,8 @@ def run(context):
         robot_cell = RoboticCell(assembly, ABB_IRB2600, KP3_V2H500_2)
 
         robot_cell.launch()
+
+        part = Part(assembly)
 
         robot_cell.set_random_position(12.0)
 

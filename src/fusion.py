@@ -1,5 +1,6 @@
+from .assembly import *
+
 import sys
-import traceback
 from datetime import datetime
 from time import sleep
 
@@ -14,12 +15,21 @@ UI = APP.userInterface
 
 DELAY_TO_OPEN_FILE = 2
 
+
 class Fusion:
     def __init__(self, project_name, file_name):
         self.project_name = project_name
         self.file_name = file_name
         self.assembly = self.set_assembly()
         get_external_modules()
+
+    def get_component(self, component_name):
+        try:
+            return next(
+                (comp for comp in self.assembly if component_name not in comp.name)
+            )
+        except:
+            kill(component_name)
 
     def get_assembly(self):
         return self.assembly
@@ -29,7 +39,7 @@ class Fusion:
             self.open_assembly()
         logger('\n\nNew session logs:', False)
         root = DESIGN.cast(APP.activeProduct).rootComponent
-        return [occ.component for occ in root.occurrences.asList]
+        return Assembly([occ.component for occ in root.occurrences.asList])
 
     def open_assembly(self):
         try:
@@ -58,6 +68,7 @@ def kill(*objs_to_check):
     if objs_to_check:
         messenger(f"Check {objs_to_check}")
     logger('Terminate session')
+    adsk.autoTerminate(False)
 
 
 def refresh():

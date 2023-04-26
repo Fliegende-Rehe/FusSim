@@ -1,11 +1,13 @@
-import asyncio
-from typing import List, Tuple
+from typing import List
 from .robot import Robot
+
+import asyncio
 
 
 class RoboticCell:
-    def __init__(self, assembly: List, *constrains: Tuple):
-        self.robots: List[Robot] = [Robot(body, limits) for body, limits in zip(assembly, constrains)]
+    def __init__(self, assembly, *constrains):
+        self.robots: List[Robot] = [Robot(assembly.get_components()[index], constrains[index])
+                                    for index in range(len(constrains))]
 
     def drive(self, targets: List[List[float]], speed: float):
         max_drive_time = max(rbt.get_max_drive_time(tar, speed) for rbt, tar in zip(self.robots, targets))

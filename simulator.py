@@ -22,8 +22,8 @@ KP3_V2H500_2 = [
     {'limits': [-180, 180], 'length': 800, 'home_position': 0, 'rotation_axis': 'y'},
 ]
 
-TOLERANCE = 0.05
-SPEED = 12.0
+TOLERANCE = 1
+SPEED = 10.0
 
 
 def run(context):
@@ -36,9 +36,9 @@ def run(context):
         robot_cell.launch()
 
         part = Part(assembly)
-        trajectories = part.get_trajectories(TOLERANCE)
+        trajectories = part.get_trajectory(TOLERANCE)
 
-        # robot_cell.process_trajectories(trajectories, SPEED)
+        robot_cell.process_trajectories(trajectories, SPEED)
 
         kill()
 

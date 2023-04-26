@@ -3,7 +3,7 @@
   <component name="FacetManager">
     <facet type="fusion360plugin" name="Fusion 360 Support">
       <configuration>
-        <option name="fusionPath" value="C:\Users\Admin\AppData\Local\Autodesk\webdeploy\production\22e664d43fce268ac9bf1fa1cda69e4a9585c997\Fusion360.exe" />
+        <option name="fusionPath" value="C:\Users\Admin\AppData\Local\Autodesk\webdeploy\production\d2926c0e17450af0d0d926a3d6da4c873b8a2007\Fusion360.exe" />
       </configuration>
     </facet>
   </component>
@@ -17,7 +17,7 @@
     <orderEntry type="module-library" scope="PROVIDED">
       <library name="Fusion 360 API" type="python">
         <CLASSES>
-          <root url="file://$USER_HOME$/AppData/Local/Autodesk/webdeploy/production/22e664d43fce268ac9bf1fa1cda69e4a9585c997/Api/Python/packages/adsk/defs" />
+          <root url="file://$USER_HOME$/AppData/Local/Autodesk/webdeploy/production/d2926c0e17450af0d0d926a3d6da4c873b8a2007/Api/Python/packages/adsk/defs" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />

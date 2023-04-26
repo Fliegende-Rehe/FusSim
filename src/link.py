@@ -33,11 +33,8 @@ class Link:
     def get_position(self) -> float:
         return degrees(self.joint.jointMotion.rotationValue)
 
-    def set_home(self) -> None:
-        self.joint.isLocked = False
-        while not self.joint.isLocked:
-            self.joint.angle.expression = str(self.home)
-            self.joint.isLocked = True
+    async def set_home(self) -> None:
+        await self.async_set_position(self.home)
 
     async def async_set_position(self, target_angle: float) -> None:
         self.joint.isLocked = False

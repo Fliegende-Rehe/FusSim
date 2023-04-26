@@ -10,7 +10,7 @@ class Assembly:
     def get_component_by_name(self, component_name):
         try:
             return next(
-                (comp for comp in self.components if component_name not in comp.name)
+                (comp for comp in self.components if component_name in comp.name)
             )
         except:
             kill(component_name)

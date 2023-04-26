@@ -1,7 +1,7 @@
 from .fusion import refresh, logger
 from .link import Link
 
-from asyncio import create_task, gather
+from asyncio import create_task, gather, run
 from typing import List
 
 LOG_PRECISION = 3
@@ -12,12 +12,6 @@ class Robot:
         self.links: List[Link] = [Link(joint, constraint) for joint, constraint in zip(body.joints, constraints)]
         self.name: str = body.name
 
-    def launch(self) -> None:
-        for link in self.links:
-            link.set_home()
-        refresh()
-        logger(f'|{self.name}| at home position')
-
     def get_name(self) -> str:
         return self.name
 
@@ -27,6 +21,15 @@ class Robot:
     def get_ranges(self, target: List[float]) -> List[float]:
         current = self.get_links_positions()
         return [abs(tar - cur) for tar, cur in zip(target, current)]
+
+    async def launch(self) -> None:
+        async def async_launch():
+            tasks = [lnk.set_home() for lnk in self.links]
+            await gather(*tasks)
+
+        await async_launch()
+        refresh()
+        logger(f'|{self.name}| at home position')
 
     async def drive(self, target: List[float], speed: float) -> None:
         def synchronize_links_speed() -> List[float]:

@@ -30,12 +30,12 @@ def run(context):
         assembly = fusion.get_assembly()
 
         robot_cell = RoboticCell(assembly, ABB_IRB2600, KP3_V2H500_2)
-
         robot_cell.launch()
 
         part = Part(assembly)
+        trajectories = part.get_trajectories()
 
-        robot_cell.set_random_position(12.0)
+        robot_cell.process_trajectories(trajectories, 12.0)
 
         kill()
 

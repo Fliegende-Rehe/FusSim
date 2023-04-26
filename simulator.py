@@ -17,10 +17,13 @@ ABB_IRB2600 = [
 ]
 
 KP3_V2H500_2 = [
-    {'limits': [-180, 180], 'length': 215, 'home_position': 0, 'rotation_axis': 'z'},
+    {'limits': [-180, 180], 'length': 1500, 'home_position': 0, 'rotation_axis': 'z'},
+    {'limits': [-180, 180], 'length': 800, 'home_position': -90, 'rotation_axis': 'y'},
     {'limits': [-180, 180], 'length': 800, 'home_position': 0, 'rotation_axis': 'y'},
-    {'limits': [-180, 180], 'length': 1500, 'home_position': 0, 'rotation_axis': 'y'},
 ]
+
+TOLERANCE = 0.05
+SPEED = 12.0
 
 
 def run(context):
@@ -33,9 +36,9 @@ def run(context):
         robot_cell.launch()
 
         part = Part(assembly)
-        trajectories = part.get_trajectories()
+        trajectories = part.get_trajectories(TOLERANCE)
 
-        robot_cell.process_trajectories(trajectories, 12.0)
+        # robot_cell.process_trajectories(trajectories, SPEED)
 
         kill()
 

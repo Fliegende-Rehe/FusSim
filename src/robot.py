@@ -1,9 +1,10 @@
-from .fusion import refresh, logger
+from .fusion import *
 from .link import Link
-from .inverse_kinematics import *
+from .kinematics import *
 
-from asyncio import create_task, gather
+from asyncio import create_task, gather, run
 from typing import List
+from math import radians, degrees
 
 LOG_PRECISION = 3
 
@@ -49,7 +50,7 @@ class Robot:
                 step = speeds[index] if abs(rng) >= speeds[index] else abs(rng)
                 current[index] += rotation_direction * step
                 if not link.fit_limits(current[index]):
-                    break
+                    kill('angles to drive')
                 tasks.append(create_task(link.async_set_position(current[index])))
             await gather(*tasks)
 
@@ -72,6 +73,13 @@ class Robot:
     def set_random_position(self, speed: float = 8.0) -> None:
         self.drive(self.get_random_positions(), speed)
 
-    def go_to_coordinates(self, points, speed):
-        angles = (IK_solve(np.eye(4), FK_solve([1, 2, 3, 4, 5, 6])))
+    def go_to_coordinates(self, desire_position, desire_orientation, speed):
+        kinematics = Kinematics([lnk.length for lnk in self.links])
+
+        initial_joint_angles = [radians(ang) for ang in self.get_links_positions()]
+        initial_position = kinematics.forward_kinematics(initial_joint_angles)
+
+        angles = kinematics.inverse_kinematics(desire_position, desire_orientation, initial_position)
+
         print(angles)
+        # # run(self.drive(angles, speed))

@@ -62,6 +62,9 @@ class Fusion:
 def get_external_modules():
     if EXTERNAL_MODULES_PATH not in sys.path:
         sys.path.append(EXTERNAL_MODULES_PATH)
+    import numpy as np
+    import sympy as sp
+    import scipy
 
 
 def kill(*objs_to_check):

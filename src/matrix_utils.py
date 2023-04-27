@@ -1,40 +1,29 @@
 import numpy as np
+import sympy as sp
 
 
 def Rx(q):
-    """
-    Rotation matrix for rotation about the x-axis by angle q in radians.
-    """
     return np.array([[1, 0, 0, 0],
-                     [0, np.cos(q), -np.sin(q), 0],
+                     [0, np.cos(q), - np.sin(q), 0],
                      [0, np.sin(q), np.cos(q), 0],
                      [0, 0, 0, 1]])
 
 
 def Ry(q):
-    """
-    Rotation matrix for rotation about the y-axis by angle q in radians.
-    """
     return np.array([[np.cos(q), 0, np.sin(q), 0],
                      [0, 1, 0, 0],
-                     [-np.sin(q), 0, np.cos(q), 0],
+                     [- np.sin(q), 0, np.cos(q), 0],
                      [0, 0, 0, 1]])
 
 
 def Rz(q):
-    """
-    Rotation matrix for rotation about the z-axis by angle q in radians.
-    """
-    return np.array([[np.cos(q), -np.sin(q), 0, 0],
+    return np.array([[np.cos(q), - np.sin(q), 0, 0],
                      [np.sin(q), np.cos(q), 0, 0],
                      [0, 0, 1, 0],
                      [0, 0, 0, 1]])
 
 
 def Tx(d):
-    """
-    Translation matrix for translation along the x-axis by distance d.
-    """
     return np.array([[1, 0, 0, d],
                      [0, 1, 0, 0],
                      [0, 0, 1, 0],
@@ -42,9 +31,6 @@ def Tx(d):
 
 
 def Ty(d):
-    """
-    Translation matrix for translation along the y-axis by distance d.
-    """
     return np.array([[1, 0, 0, 0],
                      [0, 1, 0, d],
                      [0, 0, 1, 0],
@@ -52,34 +38,39 @@ def Ty(d):
 
 
 def Tz(d):
-    """
-    Translation matrix for translation along the z-axis by distance d.
-    """
     return np.array([[1, 0, 0, 0],
                      [0, 1, 0, 0],
                      [0, 0, 1, d],
                      [0, 0, 0, 1]])
 
 
-def Jacobian(F):
-    """
-    Calculates the Jacobian matrix given a list of transformation matrices F.
-    """
-    Fext = [np.eye(4)] + F
-    u = [2, 0, 0, 2, 1, 2]  # fixed coordinate system axes
-    U = [Fext[i][:3, u[i]] for i in range(6)]  # unit vectors along the axes
-
-    O = [Fext[i][:3, 3] for i in range(7)]  # origin points of the coordinate systems
-
-    J = np.zeros((6, 6))  # initialize the Jacobian matrix
-    for i in range(6):
-        J[:, i] = np.concatenate([np.cross(U[i], (O[6] - O[i])), U[i]])
-
+def compute_Jacobian(T_matr, joints):
+    pos = T_matr  # [:3, 3]
+    J = []
+    for p in pos:
+        Ji = []
+        for j in joints:
+            Ji.append(sp.diff(p, j))  # .simplify())
+        J.append(Ji)
+    J = sp.Matrix(J)
     return J
 
 
-def Check_singular(J):
-    """
-    Checks whether the given Jacobian matrix J is singular.
-    """
-    return np.linalg.matrix_rank(J) < 6
+def Check_singular(Jacobian):
+    return np.linalg.matrix_rank(Jacobian) < 6
+
+
+def inverse_Jacobian(J, qi):
+    return sp.Matrix(np.linalg.pinv(J(float(qi[0]), float(qi[1]),
+                                      float(qi[2]), float(qi[3]), float(qi[4]))))
+
+
+def compute_error(des_pos, f, q, qi):
+    vect = des_pos - sp.Matrix(f(float(qi[0]), float(qi[1]),
+                                 float(qi[2]), float(qi[3]), float(qi[4])))
+    angle = sp.Matrix([q(float(qi[0]), float(qi[1]),
+                         float(qi[2]), float(qi[3]), float(qi[4]))])
+    error = vect.row_insert(4, angle)
+    dist = sp.sqrt(vect.dot(vect)).evalf()
+    unit_dist = np.abs(angle[0])
+    return dist, unit_dist, error

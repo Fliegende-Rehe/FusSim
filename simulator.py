@@ -8,18 +8,18 @@ PROJECT_NAME = 'gets'
 FILE_NAME = 'simulation'
 
 ABB_IRB2600 = [
-    {'limits': [-168, 168], 'length': 215, 'home_position': 0, 'rotation_axis': 'x'},
-    {'limits': [-120, 120], 'length': 700, 'home_position': 0, 'rotation_axis': 'x'},
-    {'limits': [-180, 65], 'length': 287, 'home_position': 0, 'rotation_axis': 'x'},
-    {'limits': [-180, 180], 'length': 508, 'home_position': 0, 'rotation_axis': 'x'},
-    {'limits': [-125, 125], 'length': 0, 'home_position': 0, 'rotation_axis': 'x'},
-    {'limits': [-180, 180], 'length': 600, 'home_position': -90, 'rotation_axis': 'x'}
+    {'limits': [-168, 168], 'length': 445, 'home_position': 0},
+    {'limits': [-120, 120], 'length': 115, 'home_position': 0},
+    {'limits': [-180, 75], 'length': 700, 'home_position': 0},
+    {'limits': [-180, 180], 'length': 115, 'home_position': 0},
+    {'limits': [-125, 125], 'length': 795, 'home_position': 0},
+    {'limits': [-180, 180], 'length': 540, 'home_position': -90}
 ]
 
 KP3_V2H500_2 = [
-    {'limits': [-180, 180], 'length': 1500, 'home_position': 0, 'rotation_axis': 'z'},
-    {'limits': [-180, 180], 'length': 800, 'home_position': -90, 'rotation_axis': 'y'},
-    {'limits': [-180, 180], 'length': 800, 'home_position': 0, 'rotation_axis': 'y'},
+    {'limits': [-180, 180], 'length': 1500, 'home_position': 0},
+    {'limits': [-180, 180], 'length': 800, 'home_position': -90},
+    {'limits': [-180, 180], 'length': 800, 'home_position': 0},
 ]
 
 TOLERANCE = 1

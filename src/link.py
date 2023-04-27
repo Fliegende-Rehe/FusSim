@@ -11,7 +11,6 @@ class Link:
         self.min, self.max = constraints['limits']
         self.length = constraints['length']
         self.home = constraints['home_position']
-        self.rotation_axis = constraints['rotation_axis']
 
         self.set_limits()
 

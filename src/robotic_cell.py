@@ -32,4 +32,8 @@ class RoboticCell:
         self.drive(targets, speed)
 
     def process_trajectory(self, trajectories, speed):
-        self.robots[0].go_to_coordinates(trajectories, speed)
+        desire_position = trajectories[0]
+        desire_orientation = [0.2, 0.3, 0.4]
+        self.robots[0].go_to_coordinates(desire_position, desire_orientation, speed)
+        # for point in trajectories:
+        #     self.robots[0].go_to_coordinates(point, speed)

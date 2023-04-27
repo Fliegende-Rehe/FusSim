@@ -1,4 +1,4 @@
-from src.fusion import *
+from .assembly import *
 
 import sys
 from datetime import datetime

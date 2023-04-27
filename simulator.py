@@ -1,6 +1,6 @@
-from src.robots.robotic_cell import *
-from src.robots.part import *
-from src.fusion import *
+from .src.robotic_cell import *
+from .src.part import *
+from .src.fusion import *
 
 import traceback
 

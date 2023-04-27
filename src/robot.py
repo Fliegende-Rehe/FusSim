@@ -1,6 +1,6 @@
-from src.fusion import refresh, logger
+from .fusion import refresh, logger
 from .link import Link
-from src.IK.IK_solver import *
+from .inverse_kinematics import *
 
 from asyncio import create_task, gather
 from typing import List
@@ -73,5 +73,5 @@ class Robot:
         self.drive(self.get_random_positions(), speed)
 
     def go_to_coordinates(self, points, speed):
-        angles = (IK_solve(np.eye(4), FK_solve([1, 2, 3, 4, 5, 6], 'ee')))
+        angles = (IK_solve(np.eye(4), FK_solve([1, 2, 3, 4, 5, 6])))
         print(angles)

@@ -1,10 +1,10 @@
-from .FK_solver import *
+from .forward_kinematics import *
 
 import itertools as it
 import numpy as np
 from numpy.linalg import inv
 
-
+# Inverse kinematics solver function
 def IK_solve(base_frame, ee_frame):
     # Get the transformation from the base frame to the end-effector frame
     frame = inv(base_frame) @ ee_frame

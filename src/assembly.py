@@ -1,4 +1,4 @@
-from src.fusion import *
+from .fusion import *
 
 
 class Assembly:

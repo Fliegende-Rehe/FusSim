@@ -1,4 +1,4 @@
-from src.fusion import *
+from .fusion import *
 
 ORIGIN_OFFSET = [1387.161, 0.00, 971.549]
 

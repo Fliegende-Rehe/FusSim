@@ -31,5 +31,5 @@ class RoboticCell:
         targets = [rbt.get_random_positions() for rbt in self.robots]
         self.drive(targets, speed)
 
-    def process_trajectories(self, trajectories, speed):
-        self.set_random_position(speed)
+    def process_trajectory(self, trajectories, speed):
+        self.robots[0].go_to_coordinates(trajectories, speed)

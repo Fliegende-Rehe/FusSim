@@ -1,6 +1,6 @@
-from .src.robotic_cell import *
-from .src.part import *
-from .src.fusion import *
+from src.robots.robotic_cell import *
+from src.robots.part import *
+from src.fusion import *
 
 import traceback
 
@@ -36,9 +36,9 @@ def run(context):
         robot_cell.launch()
 
         part = Part(assembly)
-        trajectories = part.get_trajectory(TOLERANCE)
+        trajectory = part.get_trajectory(TOLERANCE)
 
-        robot_cell.process_trajectories(trajectories, SPEED)
+        robot_cell.process_trajectory(trajectory, SPEED)
 
         kill()
 

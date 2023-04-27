@@ -1,7 +1,7 @@
 from math import radians, degrees
 from random import uniform
 
-from .fusion import *
+from src.fusion import *
 
 
 class Link:

@@ -1,7 +1,8 @@
-from .fusion import refresh, logger
+from src.fusion import refresh, logger
 from .link import Link
+from src.IK.IK_solver import *
 
-from asyncio import create_task, gather, run
+from asyncio import create_task, gather
 from typing import List
 
 LOG_PRECISION = 3
@@ -70,3 +71,7 @@ class Robot:
 
     def set_random_position(self, speed: float = 8.0) -> None:
         self.drive(self.get_random_positions(), speed)
+
+    def go_to_coordinates(self, points, speed):
+        angles = (IK_solve(np.eye(4), FK_solve([1, 2, 3, 4, 5, 6], 'ee')))
+        print(angles)

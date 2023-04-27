@@ -1,4 +1,4 @@
-from .assembly import *
+from src.fusion import *
 
 import sys
 from datetime import datetime
@@ -26,7 +26,7 @@ class Fusion:
     def get_component(self, component_name):
         try:
             return next(
-                (comp for comp in self.assembly if component_name not in comp.name)
+                (comp for comp in self.assembly.get_components() if component_name not in comp.name)
             )
         except:
             kill(component_name)

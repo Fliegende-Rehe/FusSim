@@ -74,12 +74,12 @@ class Robot:
         self.drive(self.get_random_positions(), speed)
 
     def go_to_coordinates(self, desire_position, desire_orientation, speed):
-        kinematics = Kinematics([lnk.length for lnk in self.links])
-
+        kinematics = Kinematics(self.links)
         initial_joint_angles = [radians(ang) for ang in self.get_links_positions()]
         initial_position = kinematics.forward_kinematics(initial_joint_angles)
 
         angles = kinematics.inverse_kinematics(desire_position, desire_orientation, initial_position)
 
-        print(angles)
+        for ang in angles:
+            print(f'{ang}\n')
         # # run(self.drive(angles, speed))

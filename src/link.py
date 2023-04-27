@@ -9,6 +9,7 @@ class Link:
         self.joint = joint
         self.joint.isLocked = True
         self.min, self.max = constraints['limits']
+        self.origin = constraints['origin']
         self.length = constraints['length']
         self.home = constraints['home_position']
 

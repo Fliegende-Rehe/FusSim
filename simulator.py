@@ -8,18 +8,18 @@ PROJECT_NAME = 'gets'
 FILE_NAME = 'simulation'
 
 ABB_IRB2600 = [
-    {'limits': [-168, 168], 'length': 445, 'home_position': 0},
-    {'limits': [-120, 120], 'length': 115, 'home_position': 0},
-    {'limits': [-180, 75], 'length': 700, 'home_position': 0},
-    {'limits': [-180, 180], 'length': 115, 'home_position': 0},
-    {'limits': [-125, 125], 'length': 795, 'home_position': 0},
-    {'limits': [-180, 180], 'length': 540, 'home_position': -90}
+    {'limits': [-168, 168], 'origin': [0, 0, 445], 'length': 455, 'home_position': 0},
+    {'limits': [-120, 120], 'origin': [150, 0, 0], 'length': 700,  'home_position': 0},
+    {'limits': [-180, 75], 'origin':  [0, 0, 700], 'length': 115,  'home_position': 0},
+    {'limits': [-180, 180], 'origin': [0, 0, 115], 'length': 795,  'home_position': 0},
+    {'limits': [-125, 125], 'origin': [795, 0, 0], 'length': 0,  'home_position': 0},
+    {'limits': [-180, 180], 'origin': [558, 0, 0], 'length': 558,  'home_position': 0}
 ]
 
 KP3_V2H500_2 = [
-    {'limits': [-180, 180], 'length': 1500, 'home_position': 0},
-    {'limits': [-180, 180], 'length': 800, 'home_position': -90},
-    {'limits': [-180, 180], 'length': 800, 'home_position': 0},
+    {'limits': [-180, 180], 'origin': [0, 0, 0], 'length': 455,  'home_position': 0},
+    {'limits': [-180, 180], 'origin': [0, 0, 0], 'length': 455,  'home_position': -90},
+    {'limits': [-180, 180], 'origin': [0, 0, 0], 'length': 455,  'home_position': 0},
 ]
 
 TOLERANCE = 1
@@ -43,4 +43,4 @@ def run(context):
         kill()
 
     except:
-        messenger(f'Error in run\n{traceback.format_exc()}')
+        print(f'Error in run\n{traceback.format_exc()}')

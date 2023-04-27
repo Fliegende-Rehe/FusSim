@@ -5,9 +5,22 @@ from scipy.spatial.transform import Rotation
 
 
 class Kinematics:
-    def __init__(self, links_length):
-        self.links_length = links_length
+    def __init__(self, links):
+        self.links_origin = [lnk.origin for lnk in links]
+        self.links_length = [lnk.length for lnk in links]
         self.base_frame = np.eye(4)
+        self.transformation = None
+
+    def get_transformation(self, q):
+        q1, q2, q3, q4, q5, q6 = q
+        l1, l2, l3, l4, l5, l6 = self.links_length
+        return [Rz(q1) @ Tz(l1),
+                Ry(q2) @ Tz(l2),
+                Ry(q3) @ Tz(l3),
+                Rx(q4) @ Tx(l4),
+                Ry(q4) @ Tx(l4),
+                Rx(q6) @ Tx(l5)
+                ]
 
     def ik_solver(self, f, q, init_angle, des_pos, J, dt=0.001, Kp=10, max_dist=0.1):
         dist_arr, vectors_arr = [], []
@@ -25,46 +38,43 @@ class Kinematics:
         return qi, dist_arr, vectors_arr
 
     def get_Td(self, desire_position, desire_orientation):
-        p = np.array(desire_position)
-        r = Rotation.from_euler('xyz', desire_orientation).as_matrix()
-        Td = self.base_frame
-        Td[:3, :3] = r
-        Td[:3, 3] = p
+        Td = inv(self.base_frame)
+        Td[:3, :3] = Rotation.from_euler('xyz', desire_orientation).as_matrix()
+        Td[:3, 3] = np.array(desire_position)
         return Td
 
     def inverse_kinematics(self, desire_position, desire_orientation, ee_frame):
         Td = self.get_Td(desire_position, desire_orientation)
-        Tw = inv(self.base_frame) @ ee_frame @ Td
+        Tw = Td @ inv(ee_frame)
         x, y, z = Tw[0, 3], Tw[1, 3], Tw[2, 3]
+        l = self.links_length
         q1_sols = [-np.arctan2(x, y)]
         q1_sols.append(q1_sols[0] + np.pi)
 
         for q1 in q1_sols:
             d = np.sqrt(x ** 2 + y ** 2)
-            e = z - self.links_length[0]
+            e = z - l[0]
             h = np.sqrt(d ** 2 + e ** 2)
-
-            theta_1_sols = [np.arccos(
-                (self.links_length[1] ** 2 + h ** 2 - (self.links_length[2] + self.links_length[3]) ** 2) / (
-                        2 * self.links_length[1] * h))]
+            theta_1_sols = [np.arccos((l[1] ** 2 + h ** 2 - (l[2] + l[3]) ** 2) / (2 * l[1] * h))]
             theta_1_sols.append(-theta_1_sols[0])
 
-            theta_2_sols = [np.arccos(
-                (self.links_length[0] ** 2 + h ** 2 - (x ** 2 + y ** 2 + z ** 2)) / (2 * self.links_length[0] * h))]
+            theta_2_sols = [np.arccos((l[0] ** 2 + h ** 2 - (x ** 2 + y ** 2 + z ** 2)) / (2 * l[0] * h))]
             theta_2_sols.append(-theta_2_sols[0])
 
             q2_sols = [np.pi - (theta_1 + theta_2) for theta_1, theta_2 in it.product(theta_1_sols, theta_2_sols)]
 
             for q2 in q2_sols:
-                # solving q3
-                q3_sols = [np.arccos(-(
-                        self.links_length[1] ** 2 + (self.links_length[2] + self.links_length[3]) ** 2 - (
-                        (z - self.links_length[0]) ** 2 + x ** 2 + y ** 2)) / (
-                                             2 * self.links_length[1] * (self.links_length[2] + self.links_length[3])))]
+                q3_sols = [np.arccos(-(l[1] ** 2 + (l[2] + l[3]) ** 2 - ((z - l[0]) ** 2 + x ** 2 + y ** 2)) / (
+                        2 * l[1] * (l[2] + l[3])))]
                 q3_sols.append(-q3_sols[0])
+
                 for q3 in q3_sols:
-                    T123 = self.T1(q1) @ self.T2(q2) @ self.T3(q3)
-                    T456 = inv(Tz(self.links_length[3])) @ inv(T123) @ Tw
+                    T1 = Rz(q1) @ Tz(self.links_length[0])
+                    T2 = Ry(q2) @ Tz(self.links_length[1])
+                    T3 = Ry(q3) @ Tz(self.links_length[2])
+
+                    T123 = T1 @ T2 @ T3
+                    T456 = inv(Tz(l[3])) @ inv(T123) @ Tw
                     q5_sols = [np.arccos(T456[2, 2])]
                     q5_sols.append(-q5_sols[0])
                     for q5 in q5_sols:
@@ -82,14 +92,16 @@ class Kinematics:
                                 q6_sols.append(-q6_sols[0])
                             for q6 in q6_sols:
                                 q = [q1, q2, q3, q4, q5, q6]
-                                if np.sum(np.abs(self.transform_base(self.base_frame, q) - ee_frame)) < 1e-5:
-                                    return q
+
+                                # if np.sum(np.abs(self.transform_base(self.base_frame, q) - ee_frame)) < 1e-5:
+                                return q
 
     def transform_base(self, trans, q):
         return trans @ self.forward_kinematics(q)
 
     def forward_kinematics(self, q):
-        A = [self.T1(q[0]), self.T2(q[1]), self.T3(q[2]), self.T4(q[3]), self.T5(q[4]), self.T6(q[5])]
+        self.transformation = self.get_transformation(q)
+        A = self.transformation
 
         def f(A):
             ret = self.base_frame
@@ -98,21 +110,4 @@ class Kinematics:
             return ret
 
         return f(A)
-
-    def T1(self, q1):
-        return Rz(q1) @ Tz(self.links_length[0])
-
-    def T2(self, q2):
-        return Rx(q2) @ Tz(self.links_length[1])
-
-    def T3(self, q3):
-        return Rx(q3) @ Tz(self.links_length[2])
-
-    def T4(self, q4):
-        return Tz(self.links_length[3]) @ Rz(q4)
-
-    def T5(self, q5):
-        return Ry(q5)
-
-    def T6(self, q6):
-        return Rz(q6) @ Tz(self.links_length[4]) @ Tz(self.links_length[5])
+        # return [f(A[:i + 1]) for i in range(6)]

@@ -25,8 +25,6 @@ class Link:
         limits.minimumValue = radians(self.min)
         limits.isMaximumValueEnabled = enable
         limits.maximumValue = radians(self.max)
-        limits.isRestValueEnabled = enable
-        limits.restVariable = radians(self.home)
         self.joint.angle.expression = str(self.home)
 
     def fit_limits(self, angle: float) -> bool:

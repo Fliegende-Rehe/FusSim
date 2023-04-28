@@ -27,6 +27,8 @@ class Kinematics:
                 Rx(q6) @ Tx(l6)
                 ]
 
+    def get_links_angles(self, position, orientation):
+        return []
     def forward_kinematics(self, q):
         self.transformation = self.set_transformation(q)
 

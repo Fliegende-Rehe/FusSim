@@ -1,7 +1,7 @@
 import traceback
 
 from .src.robotic_cell import *
-from .src.part import *
+from .src.trajectory import *
 from .src.fusion import *
 
 PROJECT_NAME = 'gets'
@@ -22,11 +22,11 @@ KP3_V2H500_2 = [
     {'limits': [-180, 180], 'origin': [0, 0, 0], 'rotation_axis': [0, 1, 0], 'length': 0, 'home': 0},
 ]
 
-TOLERANCE = 0.05
+TOLERANCE = 1
 SPEED = 20.0
 
 
-def run(context):
+def run(context) -> None:
     try:
         fusion = Fusion(PROJECT_NAME, FILE_NAME)
 
@@ -34,12 +34,9 @@ def run(context):
 
         robot_cell = RoboticCell(assembly, ABB_IRB2600, KP3_V2H500_2)
 
-        part = Part(assembly)
-        trajectory = part.get_trajectory(TOLERANCE)
+        part = assembly.get_component_by_name('part')
 
-        robot_cell.set_random_position()
-        # orientation = [0.2, 0.3, 0.4]
-        # robot_cell.process_trajectory(trajectory, orientation, SPEED)
+        robot_cell.weld_part(part, TOLERANCE, SPEED)
 
         fusion_exit(kill=False)
 

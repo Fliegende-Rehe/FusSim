@@ -20,7 +20,7 @@ class RoboticCell:
         def synchronize_robots_speed() -> List[float]:
             drive_time = max(rbt.get_drive_time(tar, speed) for rbt, tar in zip(self.robots, targets))
             ranges = [max(rbt.get_drive_ranges(tar)) for rbt, tar in zip(self.robots, targets)]
-            return [rng / drive_time for rng in ranges]
+            return [rng / drive_time if rng != 0 else 0 for rng in ranges]
 
         async def async_drive():
             tasks = [rbt.drive(tar, spd, home) for rbt, tar, spd in zip(self.robots, targets, speeds)]
@@ -36,8 +36,7 @@ class RoboticCell:
         targets = [rbt.get_random_positions() for rbt in self.robots]
         self.drive(targets, speed)
 
-    def process_trajectory(self, trajectories, speed=SPEED):
+    def process_trajectory(self, trajectories, orientation, speed=SPEED):
         pass
-        # desire_orientation = [0.2, 0.3, 0.4]
-        # for desire_position in trajectories:
-        #     self.robots[0].go_to_coordinates(desire_position, desire_orientation, speed)
+        # for tr in trajectories:
+        #     print(f'{tr}\n')

@@ -16,7 +16,8 @@ class Robot:
         return self.name
 
     def get_drive_time(self, target: List[float], speed: float) -> float:
-        return max(self.get_drive_ranges(target)) / speed
+        max_range = max(self.get_drive_ranges(target))
+        return max_range / speed if max_range != 0 else 0
 
     def get_drive_ranges(self, target: List[float]) -> List[float]:
         current = self.get_positions()
@@ -26,7 +27,7 @@ class Robot:
         def synchronize_links_speed() -> List[float]:
             ranges = self.get_drive_ranges(target)
             drive_time = self.get_drive_time(target, speed)
-            return [rng / drive_time for rng in ranges]
+            return [rng / drive_time if rng != 0 else 0 for rng in ranges]
 
         async def async_drive() -> None:
             tasks = []
@@ -47,6 +48,8 @@ class Robot:
         initial = rounded(self.get_positions())
         current = self.get_positions()
         speeds = synchronize_links_speed()
+        if all(spd == 0 for spd in speeds):
+            return
         link_is_ready = [False] * len(self.links)
         while not all(link_is_ready):
             await async_drive()
@@ -55,6 +58,8 @@ class Robot:
         logger(f'|{self.name}| at home position' if home
                else f'|{self.name}| move link from {initial} to {rounded(target)}')
 
+    def move_to(self, position, orientation):
+        pass
     def get_positions(self) -> List[float]:
         return [link.get_position() for link in self.links]
 

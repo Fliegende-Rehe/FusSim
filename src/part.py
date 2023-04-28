@@ -1,7 +1,5 @@
 from .fusion import *
 
-ORIGIN_OFFSET = [1387.161, 0.00, 971.549]
-
 
 class Part:
     def __init__(self, assembly):
@@ -16,6 +14,7 @@ class Part:
         sketch = self.component.sketches[0]
         spline = sketch.sketchCurves.sketchFittedSplines[0]
         strokes = spline.geometry.evaluator.getStrokes(0.0, 1.0, tolerance)[1]
-        points = [list(s.asArray()) for s in strokes]
-        logger(f'The trajectory consists of {len(points)} points')
-        self.trajectory = [list(map(sum, zip(ORIGIN_OFFSET, p))) for p in points]
+        spline_points = [list(s.asArray()) for s in strokes]
+        logger(f'The trajectory consists of {len(spline_points)} points')
+        origin = [0, 0, 0]
+        self.trajectory = [list(map(sum, zip(origin, p))) for p in spline_points]

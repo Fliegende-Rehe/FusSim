@@ -12,14 +12,14 @@ ABB_IRB2600 = [
     {'limits': [-120, 120], 'origin': [150, 0, 0], 'rotation_axis': [0, 1, 0], 'length': 150, 'home': 0},
     {'limits': [-180, 75], 'origin': [0, 0, 700], 'rotation_axis': [0, 1, 0], 'length': 700, 'home': 0},
     {'limits': [-180, 180], 'origin': [0, 0, 115], 'rotation_axis': [1, 0, 0], 'length': 115, 'home': 0},
-    {'limits': [-125, 125], 'origin': [795, 0, 0], 'rotation_axis': [0, 1, 0], 'length': 795, 'home': -90},
-    {'limits': [-135, 135], 'origin': [558, 0, 0], 'rotation_axis': [1, 0, 0], 'length': 558, 'home': 0}
+    {'limits': [-125, 125], 'origin': [795, 0, 0], 'rotation_axis': [0, 1, 0], 'length': 795, 'home': 0},
+    {'limits': [-135, 135], 'origin': [558, 0, 0], 'rotation_axis': [1, 0, 0], 'length': 558, 'home': 90}
 ]
 
 KP3_V2H500_2 = [
-    {'limits': [-180, 180], 'origin': [0, 0, 0], 'rotation_axis': [0, 0, 1], 'length': 455, 'home': 0},
-    {'limits': [-180, 180], 'origin': [0, 0, 0], 'rotation_axis': [0, 0, 1], 'length': 455, 'home': 0},
-    {'limits': [-180, 180], 'origin': [0, 0, 0], 'rotation_axis': [0, 0, 1], 'length': 455, 'home': 0},
+    {'limits': [-180, 180], 'origin': [0, 0, 0], 'rotation_axis': [0, 0, 1], 'length': 0, 'home': 0},
+    {'limits': [-180, 180], 'origin': [0, 0, 0], 'rotation_axis': [0, 1, 0], 'length': 0, 'home': 90},
+    {'limits': [-180, 180], 'origin': [0, 0, 0], 'rotation_axis': [0, 1, 0], 'length': 0, 'home': 0},
 ]
 
 TOLERANCE = 0.05
@@ -37,9 +37,9 @@ def run(context):
         part = Part(assembly)
         trajectory = part.get_trajectory(TOLERANCE)
 
-        robot_cell.set_random_position(SPEED)
-
-        robot_cell.home(SPEED)
+        robot_cell.set_random_position()
+        # orientation = [0.2, 0.3, 0.4]
+        # robot_cell.process_trajectory(trajectory, orientation, SPEED)
 
         fusion_exit(kill=False)
 

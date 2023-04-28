@@ -13,20 +13,19 @@ class Link:
         self.length = constraints['length']
         self.home = constraints['home_position']
 
-        self.set_limits()
-
-    def set_limits(self) -> None:
+        self.set_limits(False)
+    def set_limits(self, enable=True) -> None:
         lim = self.joint.jointMotion.rotationLimits
-        lim.isMinimumValueEnabled = True
+        lim.isMinimumValueEnabled = enable
         lim.minimumValue = radians(self.min)
-        lim.isMaximumValueEnabled = True
+        lim.isMaximumValueEnabled = enable
         lim.maximumValue = radians(self.max)
 
     def fit_limits(self, angle: float) -> bool:
         if self.min <= angle <= self.max:
             return True
         messenger(
-            f'Error in beyond_bounds for {self.joint.name}\nangle: {angle}\nlimit: ({self.min}, {self.max})'
+            f'Error in beyond_bounds for {self.joint.name}\nangle: {angle}\nlimit: ({self.min}, {self.max}\n)'
         )
         return False
 

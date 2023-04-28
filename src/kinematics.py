@@ -15,11 +15,11 @@ class Kinematics:
         q1, q2, q3, q4, q5, q6 = q
         l1, l2, l3, l4, l5, l6 = self.links_length
         return [Rz(q1) @ Tz(l1),
-                Ry(q2) @ Tz(l2),
+                Ry(q2) @ Tx(l2),
                 Ry(q3) @ Tz(l3),
-                Rx(q4) @ Tx(l4),
-                Ry(q4) @ Tx(l4),
-                Rx(q6) @ Tx(l5)
+                Rx(q4) @ Tz(l4),
+                Ry(q5) @ Tx(l5),
+                Rx(q6) @ Tx(l6)
                 ]
 
     def ik_solver(self, f, q, init_angle, des_pos, J, dt=0.001, Kp=10, max_dist=0.1):
@@ -93,7 +93,6 @@ class Kinematics:
                             for q6 in q6_sols:
                                 q = [q1, q2, q3, q4, q5, q6]
 
-                                # if np.sum(np.abs(self.transform_base(self.base_frame, q) - ee_frame)) < 1e-5:
                                 return q
 
     def transform_base(self, trans, q):
@@ -110,4 +109,3 @@ class Kinematics:
             return ret
 
         return f(A)
-        # return [f(A[:i + 1]) for i in range(6)]

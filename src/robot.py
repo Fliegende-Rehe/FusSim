@@ -49,8 +49,8 @@ class Robot:
                     continue
                 step = speeds[index] if abs(rng) >= speeds[index] else abs(rng)
                 current[index] += rotation_direction * step
-                if not link.fit_limits(current[index]):
-                    kill('angles to drive')
+                # if not link.fit_limits(current[index]):
+                #     fusion_exit('angles to drive', kill=False)
                 tasks.append(create_task(link.async_set_position(current[index])))
             await gather(*tasks)
 
@@ -62,7 +62,7 @@ class Robot:
             await async_drive()
             refresh()
         final = self.get_links_positions(LOG_PRECISION)
-        logger(f'|{self.name}| moved from {initial} to {final}')
+        logger(f'|{self.name}| joints moved from {initial} to {final}')
 
     def get_links_positions(self, precision: int = 10) -> List[float]:
         return [round(link.get_position(), precision) for link in self.links]
@@ -75,11 +75,15 @@ class Robot:
 
     def go_to_coordinates(self, desire_position, desire_orientation, speed):
         kinematics = Kinematics(self.links)
+
         initial_joint_angles = [radians(ang) for ang in self.get_links_positions()]
-        initial_position = kinematics.forward_kinematics(initial_joint_angles)
+        ee_position = kinematics.forward_kinematics(initial_joint_angles)
 
-        angles = kinematics.inverse_kinematics(desire_position, desire_orientation, initial_position)
+        angles = kinematics.inverse_kinematics(desire_position, desire_orientation, ee_position)
 
-        for ang in angles:
-            print(f'{ang}\n')
-        # # run(self.drive(angles, speed))
+        try:
+            for ang in angles:
+                print(angles)
+                run(self.drive([degrees(a) for a in ang], speed))
+        except:
+            fusion_exit('Nan angles form IK')

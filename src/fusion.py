@@ -29,7 +29,7 @@ class Fusion:
                 (comp for comp in self.assembly.get_components() if component_name not in comp.name)
             )
         except:
-            kill(component_name)
+            fusion_exit(component_name)
 
     def get_assembly(self):
         return self.assembly
@@ -53,7 +53,7 @@ class Fusion:
 
             APP.documents.open(target_file, True)
         except:
-            kill(self.project_name, self.file_name)
+            fusion_exit(self.project_name, self.file_name)
 
         sleep(DELAY_TO_OPEN_FILE)
         logger('Script is ready', False)
@@ -67,11 +67,16 @@ def get_external_modules():
     import scipy
 
 
-def kill(*objs_to_check):
+def fusion_exit(objs_to_check='your mom', kill=False):
     if objs_to_check:
-        messenger(f"Check {objs_to_check}")
+        if isinstance(objs_to_check, str):
+            msg = 'Check ' + objs_to_check
+        else:
+            msg = f'Check {objs_to_check}'
+        messenger(msg)
     logger('Terminate session')
-    adsk.autoTerminate(False)
+    if kill:
+        adsk.terminate()
 
 
 def refresh():
@@ -83,7 +88,8 @@ def refresh():
 def messenger(msg, error=True):
     msg = msg if isinstance(msg, str) else str(msg)
     title = 'Error' if error else 'Log'
-    UI.messageBox(f'{title}: {msg}')
+    print(f'{title}: {msg}')
+    # UI.messageBox(f'{title}: {msg}')
 
 
 def logger(msg, time_tag=True):

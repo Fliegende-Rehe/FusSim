@@ -13,4 +13,4 @@ class Assembly:
                 (comp for comp in self.components if component_name in comp.name)
             )
         except:
-            kill(component_name)
+            fusion_exit(component_name)

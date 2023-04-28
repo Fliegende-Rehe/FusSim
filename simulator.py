@@ -9,10 +9,10 @@ FILE_NAME = 'simulation'
 
 ABB_IRB2600 = [
     {'limits': [-168, 168], 'origin': [0, 0, 445], 'length': 455, 'home_position': 0},
-    {'limits': [-120, 120], 'origin': [150, 0, 0], 'length': 700,  'home_position': 0},
-    {'limits': [-180, 75], 'origin':  [0, 0, 700], 'length': 115,  'home_position': 0},
-    {'limits': [-180, 180], 'origin': [0, 0, 115], 'length': 795,  'home_position': 0},
-    {'limits': [-125, 125], 'origin': [795, 0, 0], 'length': 0,  'home_position': 0},
+    {'limits': [-120, 120], 'origin': [150, 0, 0], 'length': 150,  'home_position': 0},
+    {'limits': [-180, 75], 'origin':  [0, 0, 700], 'length': 700,  'home_position': 0},
+    {'limits': [-180, 180], 'origin': [0, 0, 115], 'length': 115,  'home_position': 0},
+    {'limits': [-125, 125], 'origin': [795, 0, 0], 'length': 795,  'home_position': 0},
     {'limits': [-180, 180], 'origin': [558, 0, 0], 'length': 558,  'home_position': 0}
 ]
 
@@ -22,8 +22,8 @@ KP3_V2H500_2 = [
     {'limits': [-180, 180], 'origin': [0, 0, 0], 'length': 455,  'home_position': 0},
 ]
 
-TOLERANCE = 1
-SPEED = 10.0
+TOLERANCE = 0.05
+SPEED = 20.0
 
 
 def run(context):
@@ -40,7 +40,7 @@ def run(context):
 
         robot_cell.process_trajectory(trajectory, SPEED)
 
-        kill()
+        fusion_exit()
 
     except:
         print(f'Error in run\n{traceback.format_exc()}')

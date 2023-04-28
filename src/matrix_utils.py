@@ -1,7 +1,6 @@
 import numpy as np
 import sympy as sp
 
-
 def Rx(q):
     return np.array([[1, 0, 0, 0],
                      [0, np.cos(q), - np.sin(q), 0],

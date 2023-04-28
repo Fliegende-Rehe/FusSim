@@ -61,12 +61,12 @@ class Robot:
                else f'|{self.name}| move link from {initial} to {rounded(target)}')
 
     def move_to(self, position: list[float], orientation: list[float], speed: float) -> None:
-        position = self.kinematics.get_links_angles(position, orientation)
+        position = self.kinematics.get_links_position(position, orientation)
 
-        async def weld():
+        async def async_move_to() -> None:
             await gather(self.drive(position, speed, False))
 
-        run(weld())
+        run(async_move_to())
 
     def get_position(self) -> list[float]:
         return [link.get_position() for link in self.links]

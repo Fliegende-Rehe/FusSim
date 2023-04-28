@@ -1,23 +1,15 @@
-import itertools as it
-from numpy.linalg import inv
-from scipy.spatial.transform import Rotation
-from math import degrees, radians
-
 from .matrix_utils import *
+from .link import *
 
 
 class Kinematics:
-    def __init__(self, links):
+    def __init__(self, links: list[Link]) -> None:
         self.links_origin = [lnk.origin for lnk in links]
         self.links_length = [lnk.length for lnk in links]
         self.base_frame = np.eye(4)
-        self.transformation = None
 
-    def get_transformation(self):
-        pass
-
-    def set_transformation(self, q):
-        q1, q2, q3, q4, q5, q6 = q
+    def get_transformations(self, initial_position: list[float]):
+        q1, q2, q3, q4, q5, q6 = initial_position
         l1, l2, l3, l4, l5, l6 = self.links_length
         return [Rz(q1) @ Tz(l1),
                 Ry(q2) @ Tx(l2),
@@ -27,15 +19,11 @@ class Kinematics:
                 Rx(q6) @ Tx(l6)
                 ]
 
-    def get_links_angles(self, position, orientation):
+    def get_links_position(self, position: list[float], orientation: list[float]):
         return []
-    def forward_kinematics(self, q):
-        self.transformation = self.set_transformation(q)
 
-        def f(transformation):
-            ret = self.base_frame
-            for a in transformation:
-                ret = ret @ a
-            return ret
-
-        return f(self.transformation)
+    def forward_kinematics(self, initial_position: list[float]):
+        fk = self.base_frame
+        for a in self.get_transformations(initial_position):
+            fk = fk @ a
+        return fk

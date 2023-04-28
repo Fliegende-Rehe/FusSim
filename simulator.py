@@ -1,7 +1,7 @@
 import traceback
 
 from .src.robotic_cell import *
-from .src.trajectory import *
+from .src.part import *
 from .src.fusion import *
 
 PROJECT_NAME = 'gets'
@@ -34,9 +34,9 @@ def run(context) -> None:
 
         robot_cell = RoboticCell(assembly, ABB_IRB2600, KP3_V2H500_2)
 
-        part = assembly.get_component_by_name('part')
+        part = Part(assembly ,TOLERANCE)
 
-        robot_cell.weld_part(part, TOLERANCE, SPEED)
+        robot_cell.weld_part(part, SPEED)
 
         fusion_exit(kill=False)
 

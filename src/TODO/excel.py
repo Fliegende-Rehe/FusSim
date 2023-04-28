@@ -4,7 +4,7 @@ from openpyxl import Workbook, load_workbook
 from openpyxl.utils import get_column_letter
 from openpyxl.utils.cell import column_index_from_string
 
-from .fusion import *
+from src.fusion import *
 
 
 class ExcelWorkbook:

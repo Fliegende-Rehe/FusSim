@@ -16,10 +16,10 @@ class Link:
 
         self.set_link(True)
 
-    def get_home_positions(self):
+    def get_home_positions(self) -> list[float]:
         return self.home
 
-    def set_link(self, enable=True) -> None:
+    def set_link(self, enable: bool = True) -> None:
         limits = self.joint.jointMotion.rotationLimits
         limits.isMinimumValueEnabled = enable
         limits.minimumValue = radians(self.min)

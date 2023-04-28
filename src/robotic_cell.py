@@ -1,11 +1,7 @@
 from .robot import *
-from .kinematics import *
-from .trajectory import *
-from .assembly import *
+from .part import *
 
 SPEED = 10.0
-
-TOLERANCE = 0.5
 
 
 class RoboticCell:
@@ -38,6 +34,8 @@ class RoboticCell:
         targets = [rbt.get_random_position() for rbt in self.robots]
         self.drive(targets, speed)
 
-    def weld_part(self, part, tolerance: float = TOLERANCE, speed: float = SPEED) -> None:
-        trajectory = Trajectory(part, tolerance)
-        print(trajectory.get_points())
+    def weld_part(self, part: Part, speed: float = SPEED) -> None:
+        orientation = [0.2, 0.2, 0.2]
+        trajectories = part.trajectories
+        start_point = trajectories[0]
+        # self.arm.move_to(start_point, orientation, speed)

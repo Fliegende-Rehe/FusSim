@@ -13,4 +13,5 @@ class Assembly:
                 (comp for comp in self.components if component_name in comp.name)
             )
         except:
-            fusion_exit(component_name)
+            fusion_exit(kill=True)
+            messenger(f"Check is '{component_name}' exist")

@@ -11,15 +11,22 @@ class Link:
         self.min, self.max = constraints['limits']
         self.origin = constraints['origin']
         self.length = constraints['length']
-        self.home = constraints['home_position']
+        self.home = constraints['home']
+        self.axis = constraints['rotation_axis']
 
-        self.set_limits(False)
+        self.set_limits(True)
+
+    def get_home_positions(self):
+        return self.home
+
     def set_limits(self, enable=True) -> None:
         lim = self.joint.jointMotion.rotationLimits
         lim.isMinimumValueEnabled = enable
         lim.minimumValue = radians(self.min)
         lim.isMaximumValueEnabled = enable
         lim.maximumValue = radians(self.max)
+        lim.isRestValueEnabled = enable
+        lim.restVariable = radians(self.home)
 
     def fit_limits(self, angle: float) -> bool:
         if self.min <= angle <= self.max:
@@ -32,10 +39,7 @@ class Link:
     def get_position(self) -> float:
         return degrees(self.joint.jointMotion.rotationValue)
 
-    async def set_home(self) -> None:
-        await self.async_set_position(self.home)
-
-    async def async_set_position(self, target_angle: float) -> None:
+    async def set_position(self, target_angle: float) -> None:
         self.joint.isLocked = False
         while not self.joint.isLocked:
             self.joint.jointMotion.rotationValue = radians(target_angle)

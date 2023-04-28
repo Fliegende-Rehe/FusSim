@@ -13,27 +13,27 @@ class ExcelWorkbook:
         self.column_names = {}
         self.parent_column_names = {}
 
-    def createWorkbook(self, path):
+    def createWorkbook(self, file_path):
         self.workbook = Workbook()
-        self.saveWorkbook(path)
+        self.saveWorkbook(file_path)
 
-    def saveWorkbook(self, path):
-        self.workbook.save(path)
+    def saveWorkbook(self, file_path):
+        self.workbook.save(file_path)
 
-    def openWorkbook(self, path):
-        if os.path.isfile(path):
-            self.workbook = load_workbook(filename=path)
+    def openWorkbook(self, file_path):
+        if os.path.isfile(file_path):
+            self.workbook = load_workbook(filename=file_path)
         else:
-            self.createWorkbook(path)
-        fusion.logger('Open Time Study Table')
+            self.createWorkbook(file_path)
+        logger('Open Time Study Table')
 
-    def writeToCell(self, columnName, row, value):
-        column = self.get_column_index(columnName)
+    def writeToCell(self, column_name, row, value):
+        column = self.get_column_index(column_name)
         cell = self.workbook.active.cell(row=row, column=column)
         cell.value = value
 
-    def readCell(self, columnName, row):
-        column = self.get_column_index(columnName)
+    def readCell(self, column_name, row):
+        column = self.get_column_index(column_name)
         cell = self.workbook.active.cell(row=row, column=column)
         return cell.value
 

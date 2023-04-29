@@ -3,7 +3,8 @@ from .fusion import *
 
 class Trajectory:
     def __init__(self, spline, tolerance: float) -> None:
-        strokes = spline.geometry.evaluator.getStrokes(0.0, 1.0, tolerance)[1]
+        start, end =  spline.geometry.evaluator.getParameterExtents()[1:3]
+        strokes = spline.geometry.evaluator.getStrokes(start, end, tolerance)[1]
         self.points = [list(s.asArray()) for s in strokes]
         logger(f'The trajectory consists of {len(self.points)} points')
 

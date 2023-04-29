@@ -1,76 +1,51 @@
 import numpy as np
 import sympy as sp
 
-
-def Rx(q):
-    return np.array([[1, 0, 0, 0],
-                     [0, np.cos(q), - np.sin(q), 0],
-                     [0, np.sin(q), np.cos(q), 0],
-                     [0, 0, 0, 1]])
-
-
-def Ry(q):
-    return np.array([[np.cos(q), 0, np.sin(q), 0],
-                     [0, 1, 0, 0],
-                     [- np.sin(q), 0, np.cos(q), 0],
-                     [0, 0, 0, 1]])
+from math import sin, cos
+def euler_angles(transformation_matrix):
+    nx, ny, nz = transformation_matrix[:3, 0]
+    ox, oy, oz = transformation_matrix[:3, 1]
+    ax, ay, az = transformation_matrix[:3, 2]
+    z = np.arctan2(ay, ax)
+    y_i = np.arctan2(np.sqrt(1 - az ** 2), az)
+    z_ii = np.arctan2(oz, -nz)
+    return np.array([z, y_i, z_ii])
 
 
-def Rz(q):
-    return np.array([[np.cos(q), - np.sin(q), 0, 0],
-                     [np.sin(q), np.cos(q), 0, 0],
-                     [0, 0, 1, 0],
-                     [0, 0, 0, 1]])
+def dh_table(theta, alpha, offset, length):
+    theta = np.deg2rad(theta)
+    alpha = np.deg2rad(alpha)
+    sin_t, cos_t = np.sin(theta), np.cos(theta)
+    sin_a, cos_a = np.sin(alpha), np.cos(alpha)
+    transformation = np.array([
+        [cos_t, -sin_t * cos_a, sin_t * sin_a, length * cos_t],
+        [sin_t, cos_t * cos_a, cos_t * sin_a, length * sin_t],
+        [0, sin_a, cos_a, offset],
+        [0, 0, 0, 1]
+    ])
+    return transformation
 
 
-def Tx(d):
-    return np.array([[1, 0, 0, d],
-                     [0, 1, 0, 0],
-                     [0, 0, 1, 0],
-                     [0, 0, 0, 1]])
+def compute_jacobian(transformation_matrix, joints):
+    positions = transformation_matrix[:3, 3]
+    return sp.Matrix([[sp.diff(p, j) for j in joints] for p in positions])
 
 
-def Ty(d):
-    return np.array([[1, 0, 0, 0],
-                     [0, 1, 0, d],
-                     [0, 0, 1, 0],
-                     [0, 0, 0, 1]])
+def Check_singular(jacobian):
+    return np.linalg.matrix_rank(jacobian) < 6
 
 
-def Tz(d):
-    return np.array([[1, 0, 0, 0],
-                     [0, 1, 0, 0],
-                     [0, 0, 1, d],
-                     [0, 0, 0, 1]])
-
-
-def compute_Jacobian(T_matr, joints):
-    pos = T_matr  # [:3, 3]
-    J = []
-    for p in pos:
-        Ji = []
-        for j in joints:
-            Ji.append(sp.diff(p, j))  # .simplify())
-        J.append(Ji)
-    J = sp.Matrix(J)
-    return J
-
-
-def Check_singular(Jacobian):
-    return np.linalg.matrix_rank(Jacobian) < 6
-
-
-def inverse_Jacobian(J, qi):
-    return sp.Matrix(np.linalg.pinv(J(float(qi[0]), float(qi[1]),
-                                      float(qi[2]), float(qi[3]), float(qi[4]))))
+def inverse_Jacobian(jacobian, qi):
+    qi = [float(val) for val in qi]
+    return sp.Matrix(np.linalg.pinv(jacobian(*qi)))
 
 
 def compute_error(des_pos, f, q, qi):
-    vect = des_pos - sp.Matrix(f(float(qi[0]), float(qi[1]),
-                                 float(qi[2]), float(qi[3]), float(qi[4])))
-    angle = sp.Matrix([q(float(qi[0]), float(qi[1]),
-                         float(qi[2]), float(qi[3]), float(qi[4]))])
-    error = vect.row_insert(4, angle)
+    qi = [float(val) for val in qi]
+    pos = sp.Matrix(f(*qi))
+    vect = des_pos - pos
+    angle = sp.Matrix([q(*qi)])
+    error = sp.Matrix.vstack(vect, angle)
     dist = sp.sqrt(vect.dot(vect)).evalf()
-    unit_dist = np.abs(angle[0])
+    unit_dist = abs(angle[0])
     return dist, unit_dist, error

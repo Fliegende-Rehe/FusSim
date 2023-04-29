@@ -37,5 +37,8 @@ class RoboticCell:
     def weld_part(self, part: Part, speed: float = SPEED) -> None:
         orientation = [0.2, 0.2, 0.2]
         trajectories = part.trajectories
-        start_point = trajectories[0]
+        trajectory = trajectories[0].points
+        # # for tr in trajectory:
+        # #     print(f'{tr}\n')
+        # start_point = trajectory[0]
         # self.arm.move_to(start_point, orientation, speed)

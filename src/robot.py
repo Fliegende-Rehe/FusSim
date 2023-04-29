@@ -1,7 +1,5 @@
 from asyncio import create_task, gather, run
 
-from .fusion import *
-from .link import Link
 from .kinematics import *
 
 
@@ -12,7 +10,7 @@ class Robot:
         self.kinematics = Kinematics(self.links)
 
     def get_home_position(self) -> list[float]:
-        return [lnk.get_home_positions() for lnk in self.links]
+        return [lnk.get_actual_home_positions() for lnk in self.links]
 
     def get_name(self) -> str:
         return self.name
@@ -73,3 +71,20 @@ class Robot:
 
     def get_random_position(self) -> list[float]:
         return [link.get_random_position() for link in self.links]
+
+    def get_transformation_matrix(self, links_angle: list[float]) -> np.array(list[list[float]]):
+        transformation = dh_table(*self.links[0].dh)
+        for link, ang in zip(self.links[1:], links_angle):
+            dh_param = link.dh
+            # dh_param[0] = ang
+            transformation = transformation @ dh_table(*dh_param)
+        return transformation
+
+    def forward_kinematics(self, links_angle):
+        tm = self.get_transformation_matrix(links_angle)
+        ee_cord = tm[:3, 3]
+        euler_ang = euler_angles(tm[:3, :3])
+        return np.concatenate((ee_cord, euler_ang))
+
+    def get_links_position(self, position: list[float], orientation: list[float]) -> list[float]:
+        return []

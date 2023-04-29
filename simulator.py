@@ -1,29 +1,39 @@
 import traceback
 
 from .src.robotic_cell import *
-from .src.part import *
-from .src.fusion import *
 
 PROJECT_NAME = 'gets'
 FILE_NAME = 'simulation'
 
+'''
+    θ: Angle about the previous Z, from old X to new X.
+    α: Angle about new X, from old Z-axis to new Z-axis.
+    d: Offset distance along the previous Z, from old joint to new joint center.
+    a: Length along new X, from old joint to new joint center.
+    In addition to that while placing the local coordinates in Figure 2 following rules apply;
+    — Z-axis is always the joint axis on which the joint rotates about if it is a rotational joint or moves along if it is a
+    translational joint.
+    — X-axis must be perpendicular and intersect both new Z & old Z
+    — Y-axis’s placement follows the right-hand rule based on the X & Z axes
+'''
+
 ABB_IRB2600 = [
-    {'limits': [-168, 168], 'origin': [0, 0, 445], 'rotation_axis': [0, 0, 1], 'length': 455, 'home': 0},
-    {'limits': [-120, 120], 'origin': [150, 0, 0], 'rotation_axis': [0, 1, 0], 'length': 150, 'home': 0},
-    {'limits': [-180, 75], 'origin': [0, 0, 700], 'rotation_axis': [0, 1, 0], 'length': 700, 'home': 0},
-    {'limits': [-180, 180], 'origin': [0, 0, 115], 'rotation_axis': [1, 0, 0], 'length': 115, 'home': 0},
-    {'limits': [-125, 125], 'origin': [795, 0, 0], 'rotation_axis': [0, 1, 0], 'length': 795, 'home': 0},
-    {'limits': [-135, 135], 'origin': [558, 0, 0], 'rotation_axis': [1, 0, 0], 'length': 558, 'home': 90}
+    {'limits': [-180, 180], 'dh': [0, 90, 445, 150], 'home': 0},
+    {'limits': [-95, 155], 'dh': [90, 0, 0, 700], 'home': 0},
+    {'limits': [-180, 65], 'dh': [0, 90, 0, 115], 'home': 90},
+    {'limits': [-180, 180], 'dh': [0, -90, -794.5, 0], 'home': 0},
+    {'limits': [-120, 120], 'dh': [-90, -90, 0, 0], 'home': 0},
+    {'limits': [-180, 180], 'dh': [0, 0, -53.611, -592.144], 'home': 90}
 ]
 
 KP3_V2H500_2 = [
-    {'limits': [-180, 180], 'origin': [0, 0, 0], 'rotation_axis': [0, 0, 1], 'length': 0, 'home': 0},
-    {'limits': [-180, 180], 'origin': [0, 0, 0], 'rotation_axis': [0, 1, 0], 'length': 0, 'home': 90},
-    {'limits': [-180, 180], 'origin': [0, 0, 0], 'rotation_axis': [0, 1, 0], 'length': 0, 'home': 0},
+    {'limits': [-180, 180], 'dh': [0, 90, 962.582, 1272.045], 'home': 0},
+    {'limits': [-180, 180], 'dh': [0, 0, 0, 0], 'home': 0},
+    {'limits': [-180, 180], 'dh': [0, 0, 0, 0], 'home': 0},
 ]
 
 TOLERANCE = 1
-SPEED = 20.0
+SPEED = 10
 
 
 def run(context) -> None:
@@ -34,9 +44,16 @@ def run(context) -> None:
 
         robot_cell = RoboticCell(assembly, ABB_IRB2600, KP3_V2H500_2)
 
-        part = Part(assembly ,TOLERANCE)
+         # robot_cell.set_random_position(SPEED)
+        robot = robot_cell.arm
+        ang = robot.get_position()
+        print(ang)
+        for row in robot.kinematics.forward_kinematics(ang):
+            print("{:f}".format(float(row)))
 
-        robot_cell.weld_part(part, SPEED)
+        # part = Part(assembly, TOLERANCE)
+        #
+        # robot_cell.weld_part(part, SPEED)
 
         fusion_exit(kill=False)
 

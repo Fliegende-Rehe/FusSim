@@ -1,12 +1,9 @@
 from sys import path
 from datetime import datetime
 from time import sleep
-from typing import List
 
 import adsk.core
 import adsk.fusion
-
-from .assembly import *
 
 EXTERNAL_MODULES_PATH = 'C:\\fusion\\py39_fusion\\Lib\\site-packages'
 
@@ -41,7 +38,7 @@ class Fusion:
         logger('\n\nNew session logs:', False)
         root = DESIGN.cast(APP.activeProduct).rootComponent
 
-        return Assembly([occ.component for occ in root.occurrences.asList])
+        return Assembly([occ.component for occ in root.occurrences.asList], root)
 
     def open_assembly(self):
         try:
@@ -60,6 +57,28 @@ class Fusion:
 
         sleep(DELAY_TO_OPEN_FILE)
         logger('Script is ready', False)
+
+
+class Assembly:
+    def __init__(self, component_list, root):
+        self.components = component_list
+        self.root = root
+
+    def get_component_origin(self, component):
+        origin = self.root.allOccurrencesByComponent(component).item(0).transform.getAsCoordinateSystem()[0].asArray()
+        return [cord * 10 for cord in origin]
+
+    def get_components(self):
+        return self.components
+
+    def get_component_by_name(self, component_name):
+        try:
+            return next(
+                (comp for comp in self.components if component_name in comp.name)
+            )
+        except:
+            fusion_exit(kill=True)
+            messenger(f"Check is '{component_name}' exist")
 
 
 def get_external_modules():
@@ -92,5 +111,5 @@ def logger(msg, time_tag=True):
     APP.log(msg)
 
 
-def rounded(array: List[float]):
+def rounded(array: list[float]):
     return [int(element) for element in array]

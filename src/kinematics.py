@@ -4,26 +4,21 @@ from .link import *
 
 class Kinematics:
     def __init__(self, links: list[Link]) -> None:
-        self.links_origin = [lnk.origin for lnk in links]
-        self.links_length = [lnk.length for lnk in links]
-        self.base_frame = np.eye(4)
+        self.links = links
 
-    def get_transformations(self, initial_position: list[float]):
-        q1, q2, q3, q4, q5, q6 = initial_position
-        l1, l2, l3, l4, l5, l6 = self.links_length
-        return [Rz(q1) @ Tz(l1),
-                Ry(q2) @ Tx(l2),
-                Ry(q3) @ Tz(l3),
-                Rx(q4) @ Tz(l4),
-                Ry(q5) @ Tx(l5),
-                Rx(q6) @ Tx(l6)
-                ]
+    def get_transformation_matrix(self, links_angle: list[float]) -> np.array(list[list[float]]):
+        transformation = dh_table(*self.links[0].dh)
+        for link, ang in zip(self.links[1:], links_angle):
+            dh_param = link.dh
+            # dh_param[0] = ang
+            transformation = transformation @ dh_table(*dh_param)
+        return transformation
 
-    def get_links_position(self, position: list[float], orientation: list[float]):
+    def forward_kinematics(self, links_angle):
+        tm = self.get_transformation_matrix(links_angle)
+        ee_cord = tm[:3, 3]
+        euler_ang = euler_angles(tm[:3, :3])
+        return np.concatenate((ee_cord, euler_ang))
+
+    def get_links_position(self, position: list[float], orientation: list[float]) -> list[float]:
         return []
-
-    def forward_kinematics(self, initial_position: list[float]):
-        fk = self.base_frame
-        for a in self.get_transformations(initial_position):
-            fk = fk @ a
-        return fk

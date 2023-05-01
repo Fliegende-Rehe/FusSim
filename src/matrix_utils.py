@@ -1,6 +1,7 @@
 import numpy as np
 import sympy as sp
 
+
 def euler_angles(transformation_matrix):
     nx, ny, nz = transformation_matrix[:3, 0]
     ox, oy, oz = transformation_matrix[:3, 1]
@@ -8,10 +9,11 @@ def euler_angles(transformation_matrix):
     z = np.arctan2(ay, ax)
     y_i = np.arctan2(np.sqrt(1 - az ** 2), az)
     z_ii = np.arctan2(oz, -nz)
-    return np.array([z, y_i, z_ii])
+    return np.array([np.rad2deg(z), np.rad2deg(y_i), np.rad2deg(z_ii)])
 
 
-def dh_table(theta, offset, alpha, length):
+def dh_table(dh_param):
+    theta, offset, alpha, length = dh_param.values()
     theta = np.deg2rad(theta)
     alpha = np.deg2rad(alpha)
     sin_t, cos_t = np.sin(theta), np.cos(theta)
@@ -23,6 +25,14 @@ def dh_table(theta, offset, alpha, length):
         [0, 0, 0, 1]
     ])
     return transformation
+
+
+def Ry(q):
+    q = np.deg2rad(q)
+    return np.array([[np.cos(q), 0, np.sin(q), 0],
+                     [0, 1, 0, 0],
+                     [- np.sin(q), 0, np.cos(q), 0],
+                     [0, 0, 0, 1]])
 
 
 def compute_jacobian(transformation_matrix, joints):

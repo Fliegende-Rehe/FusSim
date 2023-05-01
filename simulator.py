@@ -19,13 +19,13 @@ ABB_IRB2600 = [
 
     {'dh': {'z': 90, 'along_z': 0, 'x': 0, 'along_x': 700}, 'limits': [-90, 90], 'home': 0},
 
-    {'dh': {'z': 0, 'along_z': 0, 'x': -90, 'along_x': 61.389}, 'limits': [-75, 180], 'home': -90},
+    {'dh': {'z': 0, 'along_z': 0, 'x': 90, 'along_x': 61.389}, 'limits': [-180, 75], 'home': -90},
 
-    {'dh': {'z': 0, 'along_z': 795, 'x': 90, 'along_x': 0}, 'limits': [-180, 180], 'home': 0},
+    {'dh': {'z': 0, 'along_z': -795, 'x': -90, 'along_x': 0}, 'limits': [-180, 180], 'home': 0},
 
-    {'dh': {'z': 90, 'along_z': 0, 'x': 0, 'along_x': 0}, 'limits': [-120, 120], 'home': 0},
+    {'dh': {'z': 0, 'along_z': 0, 'x': 90, 'along_x': 0}, 'limits': [-120, 120], 'home': 0},
 
-    {'dh': {'z': 0, 'along_z': 0, 'x': -90, 'along_x': 592.144}, 'limits': [-180, 180], 'home': -90},
+    {'dh': {'z': 0, 'along_z': 592.144, 'x': 0, 'along_x': 0}, 'limits': [-180, 180], 'home': -90},
 ]
 
 TOLERANCE = 1
@@ -43,12 +43,12 @@ def run(context) -> None:
         robot_cell.set_random_position(SPEED)
 
         robot = robot_cell.robots[0]
+        angles = robot.get_positions()
+        print(angles)
 
-        ang = robot.get_positions()
-
-        print(ang)
-
-        print([float("{:f}".format(float(row))) for row in robot.kinematics.forward_kinematics(ang)])
+        kinematics = Kinematics(robot.links)
+        ee_xyz = kinematics.get_ee_xyz(angles)
+        print([float("{:f}".format(float(row))) for row in ee_xyz])
 
         fusion_exit(kill=False)
 

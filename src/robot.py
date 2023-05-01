@@ -7,7 +7,6 @@ class Robot:
     def __init__(self, body, constraints: list[dict]) -> None:
         self.links = [Link(joint, constraint) for joint, constraint in zip(body.joints, constraints)]
         self.name = body.name
-        self.kinematics = Kinematics(self.links)
 
     def get_drive_time(self, target: list[float], speed: float) -> float:
         max_range = max(self.get_drive_ranges(target))

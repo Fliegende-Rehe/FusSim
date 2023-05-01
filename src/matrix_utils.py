@@ -1,7 +1,6 @@
 import numpy as np
 import sympy as sp
 
-from math import sin, cos
 def euler_angles(transformation_matrix):
     nx, ny, nz = transformation_matrix[:3, 0]
     ox, oy, oz = transformation_matrix[:3, 1]

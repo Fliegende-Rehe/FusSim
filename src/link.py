@@ -27,8 +27,6 @@ class Link:
 
     def set_link(self, enable: bool = True) -> None:
         limits = self.joint.jointMotion.rotationLimits
-        if abs(self.defined_min) >= 180 and self.defined_max >= 180:
-            enable = False
         limits.isMinimumValueEnabled = enable
         limits.minimumValue = radians(self.actual_min)
         limits.isMaximumValueEnabled = enable
@@ -36,7 +34,7 @@ class Link:
         self.joint.angle.expression = str(self.actual_home)
 
     def fit_limits(self, angle: float) -> bool:
-        if self.actual_min <= angle <= self.actual_max:
+        if self.defined_min <= angle <= self.defined_max:
             return True
         messenger(
             f'Angle in beyond limits for {self.joint.name}\n'
@@ -46,7 +44,7 @@ class Link:
         return False
 
     def get_position(self) -> float:
-        return degrees(self.joint.jointMotion.rotationValue) + self.defined_home
+        return degrees(self.joint.jointMotion.rotationValue)
 
     async def set_position(self, target_angle: float) -> None:
         self.joint.isLocked = False
@@ -55,4 +53,4 @@ class Link:
             self.joint.isLocked = True
 
     def get_random_position(self) -> float:
-        return uniform(self.actual_min, self.actual_max)
+        return uniform(self.defined_min, self.defined_max)

@@ -9,48 +9,40 @@ class Link:
         self.joint = joint
         self.joint.isLocked = True
 
+        self.min, self.max = constraints['limits']
         self.dh = constraints['dh']
-        self.defined_home = self.dh[0]
-        self.defined_min, self.defined_max = constraints['limits']
+        self.home = constraints['home']
 
-        self.actual_home = constraints['home']
-        self.actual_min = self.actual_home - abs(self.defined_min)
-        self.actual_max = self.actual_home + abs(self.defined_max)
+        self.set_limits(True)
 
-        self.set_link(True)
-
-    def get_actual_home_positions(self) -> float:
-        return self.actual_home
-
-    def get_defined_home_positions(self) -> float:
-        return self.defined_home
-
-    def set_link(self, enable: bool = True) -> None:
+    def set_limits(self, enable: bool = True) -> None:
+        self.joint.angle.expression = str(self.home)
+        if abs(self.min) == self.max == 180:
+            enable = False
         limits = self.joint.jointMotion.rotationLimits
         limits.isMinimumValueEnabled = enable
-        limits.minimumValue = radians(self.actual_min)
+        limits.minimumValue = radians(self.min)
         limits.isMaximumValueEnabled = enable
-        limits.maximumValue = radians(self.actual_max)
-        self.joint.angle.expression = str(self.actual_home)
+        limits.maximumValue = radians(self.max)
 
-    def fit_limits(self, angle: float) -> bool:
-        if self.defined_min <= angle <= self.defined_max:
+    def get_limits(self, angle: float) -> bool:
+        if self.min <= angle <= self.max:
             return True
         messenger(
             f'Angle in beyond limits for {self.joint.name}\n'
             f'angle: {angle}\n'
-            f'limit: ({self.defined_min}, {self.defined_max})\n'
+            f'limit: ({self.min}, {self.max})\n'
         )
         return False
-
-    def get_position(self) -> float:
-        return degrees(self.joint.jointMotion.rotationValue)
 
     async def set_position(self, target_angle: float) -> None:
         self.joint.isLocked = False
         while not self.joint.isLocked:
-            self.joint.jointMotion.rotationValue = radians(target_angle + self.actual_home)
+            self.joint.jointMotion.rotationValue = radians(target_angle)
             self.joint.isLocked = True
 
+    def get_position(self) -> float:
+        return degrees(self.joint.jointMotion.rotationValue)
+
     def get_random_position(self) -> float:
-        return uniform(self.defined_min, self.defined_max)
+        return uniform(self.min, self.max)

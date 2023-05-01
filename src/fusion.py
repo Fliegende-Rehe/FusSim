@@ -1,4 +1,3 @@
-from sys import path
 from datetime import datetime
 from time import sleep
 
@@ -18,7 +17,6 @@ class Fusion:
         self.project_name = project_name
         self.file_name = file_name
         self.assembly = self.set_assembly()
-        get_external_modules()
 
     def get_component(self, component_name):
         try:
@@ -79,11 +77,6 @@ class Assembly:
         except:
             fusion_exit(kill=True)
             messenger(f"Check is '{component_name}' exist")
-
-
-def get_external_modules():
-    if EXTERNAL_MODULES_PATH not in path:
-        path.append(EXTERNAL_MODULES_PATH)
 
 
 def fusion_exit(kill=False):

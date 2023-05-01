@@ -1,26 +1,20 @@
-from asyncio import create_task, gather, run
+from asyncio import create_task, gather
 
 from .kinematics import *
 
 
 class Robot:
     def __init__(self, body, constraints: list[dict]) -> None:
-        self.links: list[Link] = [Link(joint, constraint) for joint, constraint in zip(body.joints, constraints)]
-        self.name: str = body.name
+        self.links = [Link(joint, constraint) for joint, constraint in zip(body.joints, constraints)]
+        self.name = body.name
         self.kinematics = Kinematics(self.links)
-
-    def get_home_position(self) -> list[float]:
-        return [lnk.get_actual_home_positions() for lnk in self.links]
-
-    def get_name(self) -> str:
-        return self.name
 
     def get_drive_time(self, target: list[float], speed: float) -> float:
         max_range = max(self.get_drive_ranges(target))
         return max_range / speed if max_range != 0 else 0
 
     def get_drive_ranges(self, target: list[float]) -> list[float]:
-        current = self.get_position()
+        current = self.get_positions()
         return [abs(tar - cur) for tar, cur in zip(target, current)]
 
     async def drive(self, target: list[float], speed: float, home) -> None:
@@ -40,13 +34,13 @@ class Robot:
                         current[index] += rotation_direction * speeds[index]
                     else:
                         current[index] = tar
-                    if not link.fit_limits(current[index]):
-                        fusion_exit(kill=True)
+                    if not link.get_limits(current[index]):
+                        fusion_exit(kill=False)
                     tasks.append(create_task(link.set_position(current[index])))
             await gather(*tasks)
 
-        initial = rounded(self.get_position())
-        current = self.get_position()
+        initial = rounded(self.get_positions())
+        current = self.get_positions()
         speeds = synchronize_links_speed()
         if all(spd == 0 for spd in speeds):
             return
@@ -58,33 +52,11 @@ class Robot:
         logger(f'|{self.name}| at home position' if home
                else f'|{self.name}| move link from {initial} to {rounded(target)}')
 
-    def move_to(self, position: list[float], orientation: list[float], speed: float) -> None:
-        position = self.kinematics.get_links_position(position, orientation)
-
-        async def async_move_to() -> None:
-            await gather(self.drive(position, speed, False))
-
-        run(async_move_to())
-
-    def get_position(self) -> list[float]:
+    def get_positions(self) -> list[float]:
         return [link.get_position() for link in self.links]
 
-    def get_random_position(self) -> list[float]:
+    def get_random_positions(self) -> list[float]:
         return [link.get_random_position() for link in self.links]
 
-    def get_transformation_matrix(self, links_angle: list[float]) -> np.array(list[list[float]]):
-        transformation = dh_table(*self.links[0].dh)
-        for link, ang in zip(self.links[1:], links_angle):
-            dh_param = link.dh
-            # dh_param[0] = ang
-            transformation = transformation @ dh_table(*dh_param)
-        return transformation
-
-    def forward_kinematics(self, links_angle):
-        tm = self.get_transformation_matrix(links_angle)
-        ee_cord = tm[:3, 3]
-        euler_ang = euler_angles(tm[:3, :3])
-        return np.concatenate((ee_cord, euler_ang))
-
-    def get_links_position(self, position: list[float], orientation: list[float]) -> list[float]:
-        return []
+    def get_home_position(self):
+        return [0] * len(self.links)

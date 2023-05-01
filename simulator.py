@@ -1,36 +1,31 @@
+# fusion setup
+from sys import path
+
+EXTERNAL_MODULES_PATH = 'C:\\fusion\\py39_fusion\\Lib\\site-packages'
+
+if EXTERNAL_MODULES_PATH not in path:
+    path.append(EXTERNAL_MODULES_PATH)
+
+# actual code
 import traceback
-from itertools import combinations_with_replacement
 
 from .src.robotic_cell import *
 
 PROJECT_NAME = 'gets'
 FILE_NAME = 'simulation'
 
-'''
-    θ: Angle about the previous Z, from old X to new X.
-    alpha: Angle about new X, from old Z-axis to new Z-axis.
-    d: Offset distance along the previous Z, from old joint to new joint center.
-    a: Length along new X, from old joint to new joint center.
-    In addition to that while placing the local coordinates in Figure 2 following rules apply;
-    — Z-axis is always the joint axis on which the joint rotates about if it is a rotational joint or moves along if it is a
-    translational joint.
-    — X-axis must be perpendicular and intersect both new Z & old Z
-    — Y-axis’s placement follows the right-hand rule based on the X & Z axes
-'''
-
 ABB_IRB2600 = [
-    {'limits': [-180, 180], 'dh': [0, 90, 445, 150], 'home': 0},
-    {'limits': [-95, 155], 'dh': [90, 0, 0, 700], 'home': 0},
-    {'limits': [-180, 65], 'dh': [0, -90, 0, 61.389], 'home': 90},
-    {'limits': [-180, 180], 'dh': [0, 90, 795, 0], 'home': 0},
-    {'limits': [-120, 120], 'dh': [90, 0, 0, 0], 'home': 0},
-    {'limits': [-180, 180], 'dh': [0, -90, 0, 592.144], 'home': 90}
-]
+    {'dh': {'z': 0, 'along_z': 445, 'x': 90, 'along_x': 150}, 'limits': [-255, 75], 'home': 0},
 
-KP3_V2H500_2 = [
-    {'limits': [-180, 180], 'dh': [0, 90, 962.582, 1272.045], 'home': 0},
-    {'limits': [-180, 180], 'dh': [0, 0, 0, 0], 'home': 0},
-    {'limits': [-180, 180], 'dh': [0, 0, 0, 0], 'home': 0},
+    {'dh': {'z': 90, 'along_z': 0, 'x': 0, 'along_x': 700}, 'limits': [-90, 90], 'home': 0},
+
+    {'dh': {'z': 0, 'along_z': 0, 'x': -90, 'along_x': 61.389}, 'limits': [-75, 180], 'home': 90},
+
+    {'dh': {'z': 90, 'along_z': 795, 'x': 90, 'along_x': 0}, 'limits': [-180, 180], 'home': 0},
+
+    {'dh': {'z': 0, 'along_z': 0, 'x': 90, 'along_x': 0}, 'limits': [-120, 120], 'home': 0},
+
+    {'dh': {'z': 90, 'along_z': 592.144, 'x': 90, 'along_x': 0}, 'limits': [-180, 180], 'home': 90},
 ]
 
 TOLERANCE = 1
@@ -43,13 +38,14 @@ def run(context) -> None:
 
         assembly = fusion.get_assembly()
 
-        robot_cell = RoboticCell(assembly, ABB_IRB2600, KP3_V2H500_2)
+        robot_cell = RoboticCell(assembly, ABB_IRB2600)
 
         # robot_cell.set_random_position(SPEED)
 
-        robot = robot_cell.arm
-        robot_cell.home()
-        ang = robot.get_position()
+        robot = robot_cell.robots[0]
+
+        ang = robot.get_positions()
+
         print(ang)
 
         print([float("{:f}".format(float(row))) for row in robot.kinematics.forward_kinematics(ang)[:3]])

@@ -7,12 +7,12 @@ class Kinematics:
         self.links = links
 
     def get_transformation_matrix(self, links_angle: list[float]) -> np.array(list[list[float]]):
-        self.links[0].dh[0] += links_angle[0]
-        transformation = dh_table(*self.links[0].dh)
+        self.links[0].dh['z'] += links_angle[0]
+        transformation = dh_table(*self.links[0].dh.values())
         for link, ang in zip(self.links[1:], links_angle[1:]):
             dh_param = link.dh
-            dh_param[0] += ang
-            transformation = transformation @ dh_table(*dh_param)
+            dh_param['z'] += ang
+            transformation = transformation @ dh_table(*dh_param.values())
         return transformation
 
     def forward_kinematics(self, links_angle):

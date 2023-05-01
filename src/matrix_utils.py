@@ -11,7 +11,7 @@ def euler_angles(transformation_matrix):
     return np.array([z, y_i, z_ii])
 
 
-def dh_table(theta, alpha, offset, length):
+def dh_table(theta, offset, alpha, length):
     theta = np.deg2rad(theta)
     alpha = np.deg2rad(alpha)
     sin_t, cos_t = np.sin(theta), np.cos(theta)

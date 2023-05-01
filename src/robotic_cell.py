@@ -1,3 +1,5 @@
+from asyncio import run
+
 from .robot import *
 from .part import *
 
@@ -6,9 +8,8 @@ SPEED = 10.0
 
 class RoboticCell:
     def __init__(self, assembly: Assembly, *constrains) -> None:
-        self.robots: list[Robot] = [Robot(assembly.get_components()[index], constrains[index])
+        self.robots = [Robot(assembly.get_components()[index], constrains[index])
                                     for index in range(len(constrains))]
-        self.arm, self.positioner = self.robots
 
     def home(self, speed: float = SPEED) -> None:
         home_positions = [rbt.get_home_position() for rbt in self.robots]
@@ -28,17 +29,8 @@ class RoboticCell:
         run(async_drive())
 
     def get_position(self) -> list[list[float]]:
-        return [rbt.get_position() for rbt in self.robots]
+        return [rbt.get_positions() for rbt in self.robots]
 
     def set_random_position(self, speed: float = SPEED) -> None:
-        targets = [rbt.get_random_position() for rbt in self.robots]
+        targets = [rbt.get_random_positions() for rbt in self.robots]
         self.drive(targets, speed)
-
-    def weld_part(self, part: Part, speed: float = SPEED) -> None:
-        orientation = [0.2, 0.2, 0.2]
-        trajectories = part.trajectories
-        trajectory = trajectories[0].points
-        # # for tr in trajectory:
-        # #     print(f'{tr}\n')
-        # start_point = trajectory[0]
-        # self.arm.move_to(start_point, orientation, speed)

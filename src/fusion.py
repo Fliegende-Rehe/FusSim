@@ -102,7 +102,3 @@ def logger(msg, time_tag=True):
     msg = msg if isinstance(msg, str) else str(msg)
     msg = f'[{datetime.now().strftime("%H:%M:%S")}] {msg}' if time_tag else msg
     APP.log(msg)
-
-
-def rounded(array: list[float]):
-    return [int(element) for element in array]

@@ -1,4 +1,5 @@
 # fusion setup
+import asyncio
 from sys import path
 
 EXTERNAL_MODULES_PATH = 'C:\\fusion\\py39_fusion\\Lib\\site-packages'
@@ -15,17 +16,12 @@ PROJECT_NAME = 'gets'
 FILE_NAME = 'simulation'
 
 ABB_IRB2600 = [
-    {'dh': {'z': 0, 'along_z': 445, 'x': 90, 'along_x': 150}, 'limits': [-165, 165], 'home': 90},
-
-    {'dh': {'z': 90, 'along_z': 0, 'x': 0, 'along_x': 700}, 'limits': [-90, 90], 'home': 0},
-
-    {'dh': {'z': 0, 'along_z': 0, 'x': 90, 'along_x': 61.389}, 'limits': [-180, 75], 'home': -90},
-
-    {'dh': {'z': 0, 'along_z': -795, 'x': -90, 'along_x': 0}, 'limits': [-180, 180], 'home': 0},
-
-    {'dh': {'z': 0, 'along_z': 0, 'x': 90, 'along_x': 0}, 'limits': [-120, 120], 'home': 0},
-
-    {'dh': {'z': 0, 'along_z': 592.144, 'x': 0, 'along_x': 0}, 'limits': [-180, 180], 'home': -90},
+    {'dh': {'z': 0, 'along_z': 445, 'x': -90, 'along_x': 150}, 'limits': [-165, 165], 'home': 90, 'axis': 1},
+    {'dh': {'z': 90, 'along_z': 0, 'x': 0, 'along_x': -700}, 'limits': [-90, 90], 'home': 0, 'axis': -1},
+    {'dh': {'z': 0, 'along_z': 0, 'x': 90, 'along_x': -115}, 'limits': [-180, 75], 'home': 90, 'axis': 1},
+    {'dh': {'z': 0, 'along_z': 795, 'x': -90, 'along_x': 0}, 'limits': [-180, 180], 'home': 0, 'axis': 1},
+    {'dh': {'z': 0, 'along_z': 0, 'x': 90, 'along_x': 0}, 'limits': [-120, 120], 'home': 0, 'axis': -1},
+    {'dh': {'z': 0, 'along_z': 595.144, 'x': 0, 'along_x': 53.611}, 'limits': [-180, 180], 'home': 90, 'axis': 1}
 ]
 
 TOLERANCE = 1
@@ -35,22 +31,14 @@ SPEED = 10
 def run(context) -> None:
     try:
         fusion = Fusion(PROJECT_NAME, FILE_NAME)
-
         assembly = fusion.get_assembly()
-
         robot_cell = RoboticCell(assembly, ABB_IRB2600)
 
-        robot_cell.set_random_position(SPEED)
+        robot_cell.launch()
 
-        robot = robot_cell.robots[0]
-        angles = robot.get_positions()
-        print(angles)
+        robot_cell.random_position(SPEED)
 
-        kinematics = Kinematics(robot.links)
-        ee_xyz = kinematics.get_ee_xyz(angles)
-        print([float("{:f}".format(float(row))) for row in ee_xyz])
-
-        fusion_exit(kill=False)
+        robot_cell.launch()
 
     except:
         messenger(f'Runtime error\n{traceback.format_exc()}')

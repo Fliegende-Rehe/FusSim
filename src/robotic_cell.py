@@ -9,11 +9,15 @@ SPEED = 10.0
 class RoboticCell:
     def __init__(self, assembly: Assembly, *constrains) -> None:
         self.robots = [Robot(assembly.get_components()[index], constrains[index])
-                                    for index in range(len(constrains))]
+                       for index in range(len(constrains))]
 
-    def home(self, speed: float = SPEED) -> None:
-        home_positions = [rbt.get_home_position() for rbt in self.robots]
+    def launch(self, speed: float = SPEED) -> None:
+        home_positions = [[0] * len(rbt.links) for rbt in self.robots]
         self.drive(home_positions, speed, home=True)
+
+    def random_position(self, speed: float = SPEED) -> None:
+        targets = [rbt.get_random_angles() for rbt in self.robots]
+        self.drive(targets, speed)
 
     def drive(self, targets: list[list[float]], speed: float, home: bool = False):
         def synchronize_robots_speed() -> list[float]:
@@ -27,10 +31,3 @@ class RoboticCell:
 
         speeds = synchronize_robots_speed()
         run(async_drive())
-
-    def get_position(self) -> list[list[float]]:
-        return [rbt.get_positions() for rbt in self.robots]
-
-    def set_random_position(self, speed: float = SPEED) -> None:
-        targets = [rbt.get_random_positions() for rbt in self.robots]
-        self.drive(targets, speed)

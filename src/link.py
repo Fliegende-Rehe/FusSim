@@ -14,6 +14,8 @@ class Link:
         self.home = constraints['home']
         self.direction = constraints['axis']
 
+        self.length = abs(self.dh['along_z'] if self.dh['along_z'] != 0 else self.dh['along_x'])
+
         self.set_limits(True)
 
     def set_limits(self, enable: bool = True) -> None:

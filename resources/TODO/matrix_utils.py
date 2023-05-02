@@ -2,15 +2,6 @@ import numpy as np
 import sympy as sp
 
 
-def euler_angles(transformation_matrix):
-    nx, ny, nz = transformation_matrix[:3, 0]
-    ox, oy, oz = transformation_matrix[:3, 1]
-    ax, ay, az = transformation_matrix[:3, 2]
-    z = np.arctan2(ay, ax)
-    y_i = np.arctan2(np.sqrt(1 - az ** 2), az)
-    z_ii = np.arctan2(oz, -nz)
-    return np.array([np.rad2deg(z), np.rad2deg(y_i), np.rad2deg(z_ii)])
-
 
 def compute_jacobian(transformation_matrix, joints):
     positions = transformation_matrix[:3, 3]

@@ -1,5 +1,6 @@
 from datetime import datetime
 from time import sleep
+from sys import exit
 
 import adsk.core
 import adsk.fusion
@@ -82,7 +83,7 @@ class Assembly:
 def fusion_exit(kill=False):
     logger('Terminate session')
     if kill:
-        adsk.terminate()
+        exit()
 
 
 def refresh_display():
@@ -102,3 +103,7 @@ def logger(msg, time_tag=True):
     msg = msg if isinstance(msg, str) else str(msg)
     msg = f'[{datetime.now().strftime("%H:%M:%S")}] {msg}' if time_tag else msg
     APP.log(msg)
+
+
+def rounded(arr):
+    return [int(el) for el in arr]

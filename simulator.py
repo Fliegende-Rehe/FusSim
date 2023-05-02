@@ -1,5 +1,4 @@
 # fusion setup
-import asyncio
 from sys import path
 
 EXTERNAL_MODULES_PATH = 'C:\\fusion\\py39_fusion\\Lib\\site-packages'
@@ -25,7 +24,7 @@ ABB_IRB2600 = [
 ]
 
 TOLERANCE = 1
-SPEED = 10
+SPEED = 7
 
 
 def run(context) -> None:
@@ -34,11 +33,9 @@ def run(context) -> None:
         assembly = fusion.get_assembly()
         robot_cell = RoboticCell(assembly, ABB_IRB2600)
 
-        robot_cell.launch()
+        robot_cell.robots[0].move_to([-475, -457, 1572], [-134, 100, -45], SPEED)
 
-        robot_cell.random_position(SPEED)
-
-        robot_cell.launch()
+        fusion_exit()
 
     except:
         messenger(f'Runtime error\n{traceback.format_exc()}')

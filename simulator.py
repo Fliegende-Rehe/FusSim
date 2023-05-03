@@ -36,11 +36,13 @@ def run(context) -> None:
         kinematics = robot_cell.robots[0].kinematics
 
         ang = [75] * 6
-        print(kinematics.forward_kinematics(ang))
+        forward = kinematics.forward_kinematics(ang)
+        print(f'{forward}\n')
 
 
         ee = [-546, 170, 145], [-174, 85, -47]
-        print(kinematics.inverse_kinematics(*ee))
+        inverse = kinematics.inverse_kinematics(*ee)
+        print(f'\n{inverse}')
 
         fusion_exit()
 

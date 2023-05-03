@@ -1,11 +1,8 @@
 import numpy as np
-import sympy as sp
 
 
-def transformation_matrix(dh_table):
-    theta, offset, alpha, length = dh_table.values()
-    theta = np.deg2rad(theta)
-    alpha = np.deg2rad(alpha)
+def transformation_matrix(theta, offset, alpha, length):
+    theta, alpha = np.deg2rad(theta), np.deg2rad(alpha)
     sin_t, cos_t = np.sin(theta), np.cos(theta)
     sin_a, cos_a = np.sin(alpha), np.cos(alpha)
     return np.array([
@@ -28,3 +25,12 @@ def extract_orientation(matrix):
               np.arctan2(np.sqrt(1 - az ** 2), az),
               np.arctan2(oz, -nz)]
     return [np.rad2deg(ang) for ang in angles]
+
+
+def get_transformation_matrix(dh_table, thetas):
+    transformation = []
+    for dh, ang in zip(dh_table, thetas):
+        theta, offset, alpha, length = dh.values()
+        a = transformation_matrix(theta + ang, offset, alpha, length)
+        transformation = transformation @ a if dh_table.index(dh) != 0 else a
+    return transformation

@@ -9,7 +9,7 @@ class Robot:
         self.name = body.name
         self.kinematics = Kinematics(self.links)
         self.ee_position = None
-        self.update_ee_position()
+        # self.update_ee_position()
 
     def update_ee_position(self):
         links_position = self.kinematics.get_links_position()

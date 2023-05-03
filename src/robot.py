@@ -60,11 +60,11 @@ class Robot:
     def get_random_angles(self) -> list[float]:
         return [link.get_random_position() for link in self.links]
 
-    def move_to(self, position, orientation, speed):
-        angles = self.kinematics.inverse_kinematics(position, orientation)
-        print(angles)
-
-        async def _async_move_to():
-            await gather(self.drive(angles, speed, False))
-
-        run(_async_move_to())
+    # def move_to(self, position, orientation, speed):
+    #     angles = self.kinematics.inverse_kinematics(position, orientation)
+    #     print(angles)
+    #
+    #     async def _async_move_to():
+    #         await gather(self.drive(angles, speed, False))
+    #
+    #     run(_async_move_to())

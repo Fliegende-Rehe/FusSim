@@ -33,7 +33,14 @@ def run(context) -> None:
         assembly = fusion.get_assembly()
         robot_cell = RoboticCell(assembly, ABB_IRB2600)
 
-        robot_cell.robots[0].move_to([-475, -457, 1572], [-134, 100, -45], SPEED)
+        kinematics = robot_cell.robots[0].kinematics
+
+        ang = [75] * 6
+        print(kinematics.forward_kinematics(ang))
+
+
+        ee = [-546, 170, 145], [-174, 85, -47]
+        print(kinematics.inverse_kinematics(*ee))
 
         fusion_exit()
 

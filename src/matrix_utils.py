@@ -1,4 +1,5 @@
 import numpy as np
+import sympy as sp
 
 
 def transformation_matrix(dh_table):
@@ -14,8 +15,11 @@ def transformation_matrix(dh_table):
         [0, 0, 0, 1]
     ])
 
+
 def extract_position(matrix):
     return [float("{:f}".format(float(row))) for row in matrix[:3, 3]]
+
+
 def extract_orientation(matrix):
     _, _, nz = matrix[:3, 0]
     _, _, oz = matrix[:3, 1]

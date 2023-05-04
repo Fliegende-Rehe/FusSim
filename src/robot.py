@@ -1,4 +1,4 @@
-from asyncio import create_task, gather, run
+from asyncio import create_task, gather
 
 from .kinematics import *
 
@@ -8,12 +8,7 @@ class Robot:
         self.links = [Link(joint, constraint) for joint, constraint in zip(body.joints, constraints)]
         self.name = body.name
         self.kinematics = Kinematics(self.links)
-        self.ee_position = None
-        # self.update_ee_position()
-
-    def update_ee_position(self):
-        links_position = self.kinematics.get_links_position()
-        self.ee_position = self.kinematics.forward_kinematics(links_position)
+        logger(f'|{self.name}| home position is {rounded(self.kinematics.forward_kinematics())}')
 
     def get_drive_time(self, target: list[float], speed: float) -> float:
         max_range = max(abs(tar - cur) for tar, cur in zip(target, self.kinematics.get_links_position()))
@@ -54,8 +49,7 @@ class Robot:
             await _async_drive()
             refresh_display()
 
-        self.update_ee_position()
-        logger(f'|{self.name}| moved to ' + ('home' if home else str(rounded(self.ee_position))))
+        logger(f'|{self.name}| moved to ' + ('home' if home else str(rounded(self.kinematics.forward_kinematics()))))
 
     def get_random_angles(self) -> list[float]:
         return [link.get_random_position() for link in self.links]

@@ -1,3 +1,5 @@
+from asyncio import run
+
 from .robot import *
 from .part import *
 

@@ -54,3 +54,64 @@ def euler_yzx_to_axis_angle(y_euler, z_euler, x_euler, normalize=True):
             y /= norm
             z /= norm
     return x, y, z, angle
+
+
+# from jacobian import jacobian
+# import numpy as np
+#
+# # Define the robot arm parameters
+# L1 = 2.0
+# L2 = 3.0
+# L3 = 2.0
+# L4 = 1.5
+# L5 = 1.0
+# L6 = 0.5
+#
+# # Define the target end-effector pose (position and orientation)
+# px = 4.0
+# py = 1.0
+# pz = 3.0
+# ox = 0.0
+# oy = 0.0
+# oz = 0.0
+#
+# # Define the maximum number of iterations and the error tolerance
+# max_iter = 100
+# tol = 0.01
+#
+# # Define the initial joint angles
+# theta = np.array([0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
+#
+# # Perform the inverse kinematics iteration
+# for i in range(max_iter):
+#     # Calculate the current end-effector pose using the current joint angles
+#     e = np.array(
+#         [L2 * np.cos(theta[0]) + L3 * np.cos(theta[0] + theta[1]) + L4 * np.cos(theta[0] + theta[1] + theta[2]),
+#          L2 * np.sin(theta[0]) + L3 * np.sin(theta[0] + theta[1]) + L4 * np.sin(theta[0] + theta[1] + theta[2]),
+#          L1 + L5 * np.sin(theta[3]) + L6 * np.sin(theta[3] + theta[4]),
+#          np.cos(theta[0] + theta[1] + theta[2]) * np.cos(theta[3] + theta[4] + theta[5]) - np.sin(
+#              theta[0] + theta[1] + theta[2]) * np.sin(theta[4] + theta[5]),
+#          np.sin(theta[0] + theta[1] + theta[2]) * np.cos(theta[3] + theta[4] + theta[5]) + np.cos(
+#              theta[0] + theta[1] + theta[2]) * np.sin(theta[4] + theta[5]),
+#          np.sin(theta[3] + theta[4] + theta[5]) * np.cos(theta[4])])
+#
+#     # Calculate the error between the current end-effector pose and the target pose
+#     error = np.array([px, py, pz, ox, oy, oz]) - e
+#
+#     # Check if the error is below the tolerance
+#     if np.linalg.norm(error) < tol:
+#         print("Inverse kinematics converged after %d iterations" % (i + 1))
+#         break
+#
+#     # Calculate the Jacobian matrix using the current joint angles
+#     J = jacobian(theta)
+#
+#     # Calculate the joint angle increments using the pseudoinverse of the Jacobian matrix
+#     dtheta = np.linalg.pinv(J) @ error
+#
+#     # Update the joint angles
+#     theta += dtheta
+#
+# # Print the final joint angles
+# print("Final joint angles:")
+# print(theta)

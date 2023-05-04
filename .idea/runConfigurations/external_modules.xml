@@ -2,7 +2,7 @@
   <configuration default="false" name="external_modules" type="BatchConfigurationType" factoryName="Batch">
     <module name="simulator" />
     <option name="INTERPRETER_OPTIONS" value="" />
-    <option name="WORKING_DIRECTORY" value="./src" />
+    <option name="WORKING_DIRECTORY" value="./" />
     <option name="PARENT_ENVS" value="true" />
     <option name="SCRIPT_NAME" value="external_modules.bat" />
     <option name="PARAMETERS" value="" />

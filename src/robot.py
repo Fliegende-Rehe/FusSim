@@ -8,7 +8,7 @@ class Robot:
         self.links = [Link(joint, constraint) for joint, constraint in zip(body.joints, constraints)]
         self.name = body.name
         self.kinematics = Kinematics(self.links)
-        logger(f'|{self.name}| home position is {rounded(self.kinematics.forward_kinematics())}')
+       #  logger(f'|{self.name}| home position is {rounded(self.kinematics.forward_kinematics())}')
 
     def get_drive_time(self, target: list[float], speed: float) -> float:
         max_range = max(abs(tar - cur) for tar, cur in zip(target, self.kinematics.get_links_position()))

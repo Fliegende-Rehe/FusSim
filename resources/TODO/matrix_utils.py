@@ -2,7 +2,6 @@ import numpy as np
 import sympy as sp
 
 
-
 def compute_jacobian(transformation_matrix, joints):
     positions = transformation_matrix[:3, 3]
     return sp.Matrix([[sp.diff(p, j) for j in joints] for p in positions])
@@ -55,10 +54,18 @@ def euler_yzx_to_axis_angle(y_euler, z_euler, x_euler, normalize=True):
             z /= norm
     return x, y, z, angle
 
-
 # from jacobian import jacobian
 # import numpy as np
-#
+
+
+# def jacobian(theta, dh_param):
+#     # Calculate the Jacobian matrix using the current joint angles
+#     J = sp.zeros(6, 6)
+#     for i in range(6):
+#         for j in range(6):
+#             J[i, j] = sp.diff(symbol_forward_kinematics(theta, dh_param)[i], theta[j])
+#     return J
+
 # # Define the robot arm parameters
 # L1 = 2.0
 # L2 = 3.0

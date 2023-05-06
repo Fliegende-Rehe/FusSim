@@ -9,10 +9,9 @@ class Link:
         self.joint = joint
         self.name = joint.name
 
-        self.min, self.max = constraints['limits']
-        self.dh = constraints['dh']
-        self.home = constraints['home']
-        self.direction = constraints['axis']
+        self.min, self.max, = constraints[:2]
+        self.home = constraints[2] if len(constraints) > 2 else 0
+        self.direction = constraints[3] if len(constraints) > 3 else 1
 
         self.set_limits(True)
 

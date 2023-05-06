@@ -8,8 +8,7 @@ SPEED = 8.0
 
 class RoboticCell:
     def __init__(self, assembly: Assembly, *constrains) -> None:
-        self.robots = [Robot(assembly.get_components()[index], constrains[index])
-                       for index in range(len(constrains))]
+        self.robots = [Robot(body, param) for body, param in zip(assembly.get_components(), constrains)]
 
     def launch(self, speed: float = SPEED) -> None:
         home_positions = [[0] * len(rbt.links) for rbt in self.robots]

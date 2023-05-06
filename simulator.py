@@ -14,14 +14,22 @@ from .src.robotic_cell import *
 PROJECT_NAME = 'gets'
 FILE_NAME = 'simulation'
 
-ABB_IRB2600 = [
-    {'dh': {'z': 0, 'along_z': 445, 'x': 90, 'along_x': 150}, 'limits': [-165, 165], 'home': 90, 'axis': 1},
-    {'dh': {'z': 90, 'along_z': 0, 'x': 0, 'along_x': 700}, 'limits': [-90, 90], 'home': 0, 'axis': 1},
-    {'dh': {'z': 0, 'along_z': 0, 'x': 90, 'along_x': 115}, 'limits': [-180, 75], 'home': 90, 'axis': -1},
-    {'dh': {'z': 0, 'along_z': 795, 'x': -90, 'along_x': 0}, 'limits': [-180, 180], 'home': 0, 'axis': 1},
-    {'dh': {'z': 0, 'along_z': 0, 'x': 90, 'along_x': 0}, 'limits': [-120, 120], 'home': 0, 'axis': 1},
-    {'dh': {'z': 0, 'along_z': 595.144, 'x': 0, 'along_x': -53.611}, 'limits': [-180, 180], 'home': -90, 'axis': 1}
-]
+ABB_IRB2600 = {
+    'dh_table': {
+        'theta': [0, 90, 0, 0, 0, 0],
+        'length': [150, 700, 115, 0, 0, -53.611],
+        'alpha': [90, 0, 90, -90, 90, 0],
+        'offset': [445, 0, 0, 795, 0, 595.144]
+    },
+    'links_param': [
+        [-165, 165, 90],
+        [-90, 90],
+        [-75, 180, 90, -1],
+        [-180, 180],
+        [-120, 120],
+        [-180, 180, -90]
+    ],
+}
 
 TOLERANCE = 1
 SPEED = 10
@@ -35,16 +43,13 @@ def run(context) -> None:
 
         kinematics = robot_cell.robots[0].kinematics
 
-        home = kinematics.forward_kinematics()
-        print(f'home is {rounded(home)}')
-
         ang = [-50] * 6
         forward = kinematics.forward_kinematics(ang)
         print(f'with {rounded(forward)} \nresult must be {ang}\n')
 
-        target = forward[:len(forward) // 2], forward[len(forward) // 2:]
-        inverse = kinematics.inverse_kinematics(*target)
-        print(f'\nresult of ik = {inverse}')
+        # target = forward[:len(forward) // 2], forward[len(forward) // 2:]
+        # inverse = kinematics.inverse_kinematics(*target)
+        # print(f'\nresult of ik = {inverse}')
 
         fusion_exit()
 

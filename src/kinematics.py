@@ -18,21 +18,19 @@ class Kinematics:
         self.dh_table = dh_table
         self.links = links
 
-    def forward_kinematics(self, target=None):
-        if target is None:
-            target = self.get_links_position()
+    def forward_kinematics(self, theta=None):
+        if theta is None:
+            theta = self.get_links_position()
 
-        target = np.array([sp.rad(tar) for tar in target], dtype=float)
+        theta = np.array([sp.rad(tar) for tar in theta], dtype=float)
 
-        ee_frame = self.ee_frame(*target)
+        ee_frame = self.ee_frame(*theta)
         position = ee_frame[:3, 3].tolist()
-        orientation = rot2eul(ee_frame[:3, :3]).tolist()
-
-        return [element[0] for element in (position + orientation)]
+        orientation = rot2eul(ee_frame[:3, :3])
+        return position + orientation
 
     def inverse_kinematics(self, target, dt=0.001, kp=10, max_dist=0.1):
-
-
+        print(self.target_frame(*target))
         return []
 
     def get_links_position(self) -> list[float]:

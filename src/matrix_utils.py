@@ -8,14 +8,7 @@ def ee_transformation(angles, dh_table, frame=sp.eye(4)):
                                                    angles):
         a = transformation_matrix(sp.rad(alpha), length, sp.rad(theta) + angle, offset)
         frame = frame * a
-    position = frame[:3, 3]
-    orientation = rot2eul(frame[:3, :3])
-    return position.col_join(orientation)
-
-
-def target_transformation(target):
-    px, py, pz, alpha, beta, gamma = target
-    return eul2rot(alpha, beta, gamma) * Txyz(px, py, pz)
+    return frame
 
 
 def transformation_matrix(alpha, length, theta, offset):
@@ -29,36 +22,34 @@ def transformation_matrix(alpha, length, theta, offset):
     ])
 
 
-def eul2rot(alpha, beta, gamma):
-    return Rz(alpha) * Ry(beta) * Rz(gamma)
-
-
 def rot2eul(matrix):
-    alpha = sp.atan2(matrix[0, 2], -matrix[1, 2])
-    beta = sp.acos(matrix[2, 2])
-    gamma = sp.atan2(matrix[2, 0], matrix[2, 1])
-    return sp.Matrix([alpha, beta, gamma])
+    alpha = np.degrees(np.arctan2(matrix[0, 2], -matrix[1, 2]))
+    beta = np.degrees(np.arccos(matrix[2, 2]))
+    gamma = np.degrees(np.arctan2(matrix[2, 0], matrix[2, 1]))
+    return [alpha, beta, gamma]
 
 
-def Rx(q):
-    return sp.Matrix([[1, 0, 0, 0],
-                      [0, sp.cos(q), -sp.sin(q), 0],
-                      [0, sp.sin(q), sp.cos(q), 0],
-                      [0, 0, 0, 1]])
+def target_transformation(target):
+    px, py, pz, alpha, beta, gamma = target
+    return Rz(alpha) * Ry(beta) * Rz(gamma) * Txyz(px, py, pz)
 
 
 def Ry(q):
-    return sp.Matrix([[sp.cos(q), 0, sp.sin(q), 0],
-                      [0, 1, 0, 0],
-                      [-sp.sin(q), 0, sp.cos(q), 0],
-                      [0, 0, 0, 1]])
+    return sp.Matrix([
+        [sp.cos(q), 0, sp.sin(q), 0],
+        [0, 1, 0, 0],
+        [-sp.sin(q), 0, sp.cos(q), 0],
+        [0, 0, 0, 1]
+    ])
 
 
 def Rz(q):
-    return sp.Matrix([[sp.cos(q), -sp.sin(q), 0, 0],
-                      [sp.sin(q), sp.cos(q), 0, 0],
-                      [0, 0, 1, 0],
-                      [0, 0, 0, 1]])
+    return sp.Matrix([
+        [sp.cos(q), -sp.sin(q), 0, 0],
+        [sp.sin(q), sp.cos(q), 0, 0],
+        [0, 0, 1, 0],
+        [0, 0, 0, 1]
+    ])
 
 
 def Txyz(px, py, pz):

@@ -47,9 +47,8 @@ def run(context) -> None:
         forward = kinematics.forward_kinematics(ang)
         print(f'with {rounded(forward)} \nresult must be {ang}\n')
 
-        # target = forward[:len(forward) // 2], forward[len(forward) // 2:]
-        # inverse = kinematics.inverse_kinematics(*target)
-        # print(f'\nresult of ik = {inverse}')
+        inverse = kinematics.inverse_kinematics(forward)
+        print(f'\nresult of ik = {inverse}')
 
         fusion_exit()
 

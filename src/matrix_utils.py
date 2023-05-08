@@ -8,7 +8,9 @@ def ee_transformation(angles, dh_table, frame=sp.eye(4)):
                                                    angles):
         a = transformation_matrix(sp.rad(alpha), length, sp.rad(theta) + angle, offset)
         frame = frame * a
-    return frame
+    position = frame[:3, 3]
+    orientation = rot2eul(frame[:3, :3])
+    return position.col_join(orientation)
 
 
 def transformation_matrix(alpha, length, theta, offset):
@@ -22,40 +24,13 @@ def transformation_matrix(alpha, length, theta, offset):
     ])
 
 
-def rot2eul(matrix):
-    alpha = np.degrees(np.arctan2(matrix[0, 2], -matrix[1, 2]))
-    beta = np.degrees(np.arccos(matrix[2, 2]))
-    gamma = np.degrees(np.arctan2(matrix[2, 0], matrix[2, 1]))
-    return [alpha, beta, gamma]
+def rot2eul(rot_matrix):
+    phi = sp.atan2(rot_matrix[2, 1], rot_matrix[2, 0])
+    nu = sp.acos(rot_matrix[2, 2])
+    psi = sp.atan2(rot_matrix[1, 2], -rot_matrix[0, 2])
+    return sp.Matrix([phi, nu, psi])
 
 
-def target_transformation(target):
-    px, py, pz, alpha, beta, gamma = target
-    return Rz(alpha) * Ry(beta) * Rz(gamma) * Txyz(px, py, pz)
-
-
-def Ry(q):
-    return sp.Matrix([
-        [sp.cos(q), 0, sp.sin(q), 0],
-        [0, 1, 0, 0],
-        [-sp.sin(q), 0, sp.cos(q), 0],
-        [0, 0, 0, 1]
-    ])
-
-
-def Rz(q):
-    return sp.Matrix([
-        [sp.cos(q), -sp.sin(q), 0, 0],
-        [sp.sin(q), sp.cos(q), 0, 0],
-        [0, 0, 1, 0],
-        [0, 0, 0, 1]
-    ])
-
-
-def Txyz(px, py, pz):
-    return sp.Matrix([
-        [1, 0, 0, px],
-        [0, 1, 0, py],
-        [0, 0, 1, pz],
-        [0, 0, 0, 1]
-    ])
+def jacobian_matrix(equation, variable):
+    j = [[eq.diff(var) for var in variable] for eq in equation]
+    return sp.Matrix(j)

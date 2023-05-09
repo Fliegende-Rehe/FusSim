@@ -34,7 +34,7 @@ class Fusion:
     def set_assembly(self):
         if self.file_name not in APP.activeDocument.name:
             self.open_assembly()
-        logger('\n\nNew session logs:', False)
+        logger('New session logs:') # logger('\n\nNew session logs:', False)
         root = DESIGN.cast(APP.activeProduct).rootComponent
 
         return Assembly([occ.component for occ in root.occurrences.asList], root)

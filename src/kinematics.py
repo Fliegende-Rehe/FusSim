@@ -36,8 +36,7 @@ class Kinematics:
         position = sp.Matrix(target[:3] - self.position(*qi))
         orientation = sp.Matrix(target[3:] - self.orientation(*qi))
         error = position.col_join(orientation)
-
-        distance = sp.sqrt(error.dot(error)).evalf()
+        distance = sp.sqrt(position.dot(position)).evalf()
         return distance, error
 
     def inverse_kinematics(self, target, dt=0.01, min_distance=0.1):
@@ -46,7 +45,7 @@ class Kinematics:
         distance, error = self.compute_error(qi, target)
         while distance > min_distance:
             Jinv = sp.Matrix(np.linalg.pinv(self.jacobian(*qi)))
-            qi += np.array((dt * Jinv * error).evalf().T.tolist()[0], dtype=float)
+            qi = qi + np.array((dt * Jinv * error).evalf().T.tolist()[0], dtype=float)
             distance, error = self.compute_error(qi, target)
         return np.rad2deg(qi)
 

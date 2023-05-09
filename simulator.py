@@ -45,22 +45,20 @@ def run(context) -> None:
 
         ang = [-50] * 6
         forward = kinematics.forward_kinematics(ang)
-        print(f'Forward kinematics: \n'
+        logger(f'Forward kinematics: \n'
               f'input {ang} deg \n'
               f'output {rounded(forward)} \n')
 
         inverse = kinematics.inverse_kinematics(forward)
-        print(f'Inverse kinematics: \n'
+        logger(f'Inverse kinematics: \n'
               f'input {rounded(forward)} \n'
               f'output {rounded(inverse)} deg \n')
 
-        print(f'Check: \n'
+        logger(f'Check: \n'
               f'IK = {rounded(inverse)} deg \n'
               f'FK = {rounded(kinematics.forward_kinematics(inverse))} \n')
 
         robot_cell.drive([inverse], SPEED)
-
-        fusion_exit()
 
     except:
         messenger(f'Runtime error\n{traceback.format_exc()}')

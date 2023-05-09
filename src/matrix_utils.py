@@ -8,9 +8,7 @@ def ee_transformation(angles, dh_table, frame=sp.eye(4)):
                                                    angles):
         a = transformation_matrix(sp.rad(alpha), length, sp.rad(theta) + angle, offset)
         frame = frame * a
-    position = frame[:3, 3]
-    orientation = rot2eul(frame[:3, :3])
-    return position.col_join(orientation)
+    return sp.Matrix(frame)
 
 
 def transformation_matrix(alpha, length, theta, offset):
@@ -24,13 +22,14 @@ def transformation_matrix(alpha, length, theta, offset):
     ])
 
 
-def rot2eul(rot_matrix):
-    phi = sp.atan2(rot_matrix[2, 1], rot_matrix[2, 0])
-    nu = sp.acos(rot_matrix[2, 2])
-    psi = sp.atan2(rot_matrix[1, 2], -rot_matrix[0, 2])
-    return sp.Matrix([phi, nu, psi])
+def get_orientation(transformation):
+    rot_matrix = transformation[:3, :3]
+    return sp.Matrix([
+        sp.atan2(rot_matrix[2, 1], rot_matrix[2, 0]),
+        sp.acos(rot_matrix[2, 2]),
+        sp.atan2(rot_matrix[1, 2], -rot_matrix[0, 2])
+    ])
 
 
-def jacobian_matrix(equation, variable):
-    j = [[eq.diff(var) for var in variable] for eq in equation]
-    return sp.Matrix(j)
+def get_position(transformation):
+    return sp.Matrix(transformation[:3, 3])

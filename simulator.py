@@ -45,10 +45,20 @@ def run(context) -> None:
 
         ang = [-50] * 6
         forward = kinematics.forward_kinematics(ang)
-        print(f'with {rounded(forward)} \nresult must be {ang}\n')
+        print(f'Forward kinematics: \n'
+              f'input {ang} deg \n'
+              f'output {rounded(forward)} \n')
 
         inverse = kinematics.inverse_kinematics(forward)
-        print(f'result of ik = {inverse}')
+        print(f'Inverse kinematics: \n'
+              f'input {rounded(forward)} \n'
+              f'output {rounded(inverse)} deg \n')
+
+        print(f'Check: \n'
+              f'IK = {rounded(inverse)} deg \n'
+              f'FK = {rounded(kinematics.forward_kinematics(inverse))} \n')
+
+        robot_cell.drive([inverse], SPEED)
 
         fusion_exit()
 

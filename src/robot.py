@@ -9,7 +9,7 @@ class Robot:
         self.links = [Link(joint, constraint) for joint, constraint in zip(body.joints, links_param)]
         self.kinematics = Kinematics(self.links, dh_table)
         self.name = body.name
-        # logger(f'|{self.name}| home position is {rounded(self.kinematics.forward_kinematics().T.tolist()[0])}')
+        logger(f'|{self.name}| home position is {rounded(self.kinematics.forward_kinematics())}')
 
     def get_drive_time(self, target: list[float], speed: float) -> float:
         max_range = max(abs(tar - cur) for tar, cur in zip(target, self.kinematics.get_links_position()))
@@ -50,7 +50,8 @@ class Robot:
             await _async_drive()
             refresh_display()
 
-        logger(f'|{self.name}| moved to ' + ('home' if home else str(rounded(self.kinematics.forward_kinematics()))))
+        position = rounded(self.kinematics.forward_kinematics(current))
+        logger(f'|{self.name}| moved to ' + ('home' if home else str(position)))
 
     def get_random_angles(self) -> list[float]:
         return [link.get_random_position() for link in self.links]

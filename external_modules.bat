@@ -8,7 +8,6 @@ call py39_fusion\Scripts\activate
 
 python.exe -m pip install --upgrade pip
 
-pip install notebook
 pip install numpy
 pip install openpyxl
 pip install sympy

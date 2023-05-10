@@ -1,4 +1,4 @@
-import numpy as np
+from numpy import pi
 from sympy.physics.mechanics import dynamicsymbols
 
 from .matrix_utils import *
@@ -10,14 +10,25 @@ class Kinematics:
         thetas = dynamicsymbols('theta0:{}'.format(len(links)))
         ee_frame = ee_transformation(thetas, dh_table)
 
+        logger('position\n')
         position = get_position(ee_frame)
+
+        logger('orientation\n')
         orientation = get_orientation(ee_frame)
+
+        logger('distance\n')
         distance = position.jacobian(thetas)
+
+        logger('angle\n')
         angle = orientation.jacobian(thetas)
 
-        self.forward = sp.lambdify(thetas, position.col_join(orientation))
-        self.jacobian = sp.lambdify(thetas, distance.col_join(angle))
+        logger('forward\n')
+        self.forward = np.vectorize(sp.lambdify(thetas, position.col_join(orientation)))
 
+        logger('jacobian\n')
+        self.jacobian = np.vectorize(sp.lambdify(thetas, distance.col_join(angle)))
+
+        logger('dh_table\n')
         self.dh_table = dh_table
         self.links = links
 
@@ -36,8 +47,8 @@ class Kinematics:
             thetas = thetas + inverse_jacobian @ error * dt
             error = target - self.forward_kinematics(thetas)
 
-        ik_solution = (thetas % (2 * np.pi))
-        ik_solution = np.where(ik_solution > np.pi, ik_solution - (2 * np.pi), ik_solution)
+        ik_solution = (thetas % (2 * pi))
+        ik_solution = np.where(ik_solution > pi, ik_solution - (2 * pi), ik_solution)
         return ik_solution.tolist()
 
     def get_links_position(self):

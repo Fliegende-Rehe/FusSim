@@ -1,4 +1,3 @@
-from math import radians
 from random import uniform
 
 import numpy as np
@@ -23,9 +22,9 @@ class Link:
             enable = False
         limits = self.joint.jointMotion.rotationLimits
         limits.isMinimumValueEnabled = enable
-        limits.minimumValue = radians(self.min if self.direction == 1 else -abs(self.max))
+        limits.minimumValue = np.deg2rad(self.min if self.direction == 1 else -abs(self.max))
         limits.isMaximumValueEnabled = enable
-        limits.maximumValue = radians(self.max if self.direction == 1 else abs(self.min))
+        limits.maximumValue = np.deg2rad(self.max if self.direction == 1 else abs(self.min))
         self.joint.isLocked = True
 
     def get_limits(self, angle: float) -> bool:

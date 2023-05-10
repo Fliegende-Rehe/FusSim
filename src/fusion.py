@@ -34,7 +34,7 @@ class Fusion:
     def set_assembly(self):
         if self.file_name not in APP.activeDocument.name:
             self.open_assembly()
-        logger('New session logs:') # logger('\n\nNew session logs:', False)
+        logger('\n\nNew session logs:', False)
         root = DESIGN.cast(APP.activeProduct).rootComponent
 
         return Assembly([occ.component for occ in root.occurrences.asList], root)
@@ -102,8 +102,8 @@ def messenger(msg, error=True):
 def logger(msg, time_tag=True):
     msg = msg if isinstance(msg, str) else str(msg)
     msg = f'[{datetime.now().strftime("%H:%M:%S")}] {msg} \n' if time_tag else msg
-    print(msg) # APP.log
+    print(msg)  # APP.log
 
 
 def rounded(arr):
-    return ['{:.2f}'.format(el) for el in arr]
+    return ['{:.3f}'.format(el) for el in arr]

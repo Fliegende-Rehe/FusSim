@@ -7,6 +7,8 @@ if EXTERNAL_MODULES_PATH not in path:
     path.append(EXTERNAL_MODULES_PATH)
 
 # actual code
+import traceback
+
 from .src.robotic_cell import *
 
 PROJECT_NAME = 'gets'
@@ -30,7 +32,7 @@ ABB_IRB2600 = {
 }
 
 TOLERANCE = 1
-SPEED = 0.25
+SPEED = 0.5
 
 
 def run(context) -> None:
@@ -39,22 +41,15 @@ def run(context) -> None:
         assembly = fusion.get_assembly()
         robot_cell = RoboticCell(assembly, ABB_IRB2600)
 
-        robot = robot_cell.robots[0]
-        kinematics = robot.kinematics
+        part = Part(assembly, TOLERANCE)
+        trajectory = part.trajectories[0].points
 
-        for _ in range(5):
-            ang =  robot.get_random_angles()
-            forward = kinematics.forward_kinematics(ang)
-            inverse = kinematics.inverse_kinematics(forward)
-            logger(f'Check: \n'
-                   f'target is {rounded(forward)} \n'
-                   f'result is {rounded(kinematics.forward_kinematics(inverse))} \n'
-                   f'with {rounded(np.rad2deg(inverse))} rad \n'
-                   )
+        for target in trajectory:
+            thetas = robot_cell.robots[0].kinematics.inverse_kinematics(target + [0.0, np.pi / 2, np.pi])
+            robot_cell.drive([thetas], SPEED)
 
-            robot_cell.drive([inverse], SPEED)
-
+        robot_cell.launch(SPEED)
         fusion_exit()
 
-    except Exception as e:
-        messenger(f'Runtime error\n{e}')
+    except:
+        messenger(f'Runtime error\n{traceback.format_exc()}')

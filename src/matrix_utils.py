@@ -1,6 +1,5 @@
 import sympy as sp
 
-
 def ee_transformation(angles, dh_table, frame=sp.eye(4)):
     for alpha, length, offset, theta, angle in zip(dh_table['alpha'], dh_table['length'],
                                                    dh_table['offset'], dh_table['theta'],

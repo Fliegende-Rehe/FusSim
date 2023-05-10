@@ -6,12 +6,14 @@ virtualenv -p  C:\Users\Admin\AppData\Local\Autodesk\webdeploy\production\b4885f
 
 call py39_fusion\Scripts\activate
 
-python.exe -m pip install --upgrade pip
+python -m pip install --upgrade pip
 
 pip install numpy
-pip install openpyxl
 pip install sympy
-pip install scipy
+pip install openpyxl
+pip install setuptools
+pip install cython
+
 pip list
 
 deactivate

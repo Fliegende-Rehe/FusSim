@@ -1,8 +1,9 @@
 from numpy import pi
 from sympy.physics.mechanics import dynamicsymbols
 
-from .matrix_utils import *
-from .link import *
+from matrix_utils import *
+from robot.link import *
+# from .jacobian_cython import *
 
 
 class Kinematics:
@@ -10,25 +11,15 @@ class Kinematics:
         thetas = dynamicsymbols('theta0:{}'.format(len(links)))
         ee_frame = ee_transformation(thetas, dh_table)
 
-        logger('position\n')
         position = get_position(ee_frame)
-
-        logger('orientation\n')
         orientation = get_orientation(ee_frame)
-
-        logger('distance\n')
+        # distance = compute_jacobian(thetas, position)
         distance = position.jacobian(thetas)
-
-        logger('angle\n')
         angle = orientation.jacobian(thetas)
 
-        logger('forward\n')
-        self.forward = np.vectorize(sp.lambdify(thetas, position.col_join(orientation)))
+        self.forward = sp.lambdify(thetas, position.col_join(orientation))
+        self.jacobian = sp.lambdify(thetas, distance.col_join(angle))
 
-        logger('jacobian\n')
-        self.jacobian = np.vectorize(sp.lambdify(thetas, distance.col_join(angle)))
-
-        logger('dh_table\n')
         self.dh_table = dh_table
         self.links = links
 

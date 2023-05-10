@@ -1,4 +1,4 @@
-from .trajectory import *
+from utilities.trajectory import *
 
 TOLERANCE = 0.5
 

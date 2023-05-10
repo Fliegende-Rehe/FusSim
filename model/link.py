@@ -2,7 +2,7 @@ from random import uniform
 
 import numpy as np
 
-from .fusion import *
+from utilities.fusion import *
 
 
 class Link:

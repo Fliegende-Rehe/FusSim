@@ -1,6 +1,6 @@
 from asyncio import create_task, gather
 
-from .kinematics import *
+from kinematics.kinematics import *
 
 
 class Robot:

@@ -2,13 +2,13 @@ from asyncio import create_task, gather
 
 from agla.kinematics import *
 
+
 class Robot:
     def __init__(self, body, constraints) -> None:
         dh_table, links_param = constraints.values()
         self.links = [Link(joint, constraint) for joint, constraint in zip(body.joints, links_param)]
         self.kinematics = Kinematics(self.links, dh_table)
         self.name = body.name
-        logger(f'|{self.name}| home position is {rounded(self.kinematics.forward_kinematics())}')
 
     def get_drive_time(self, target: list[float], speed: float) -> float:
         max_range = max(abs(tar - cur) for tar, cur in zip(target, self.kinematics.get_links_position()))

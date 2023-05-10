@@ -11,7 +11,7 @@ class RoboticCell:
         self.robots = [Robot(body, param) for body, param in zip(assembly.get_components(), constrains)]
 
     def launch(self, speed: float = SPEED) -> None:
-        home_positions = [[0] * len(rbt.links) for rbt in self.robots]
+        home_positions = [[0.0] * len(rbt.links) for rbt in self.robots]
         self.drive(home_positions, speed, home=True)
 
     def random_position(self, speed: float = SPEED) -> None:

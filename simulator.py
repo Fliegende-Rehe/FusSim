@@ -1,13 +1,6 @@
 import traceback
-import sys
 
-EXTERNAL_MODULES_PATH = 'C:\\fusion\\py39_fusion\\Lib\\site-packages'
-ROOT_PATH = 'C:\\Workspace\\simulator'
-
-if EXTERNAL_MODULES_PATH not in sys.path:
-    sys.path.append(EXTERNAL_MODULES_PATH)
-if ROOT_PATH not in sys.path:
-    sys.path.append(ROOT_PATH)
+from .utilities.add_external_modules import *
 
 from model.robotic_cell import *
 
@@ -33,7 +26,7 @@ ABB_IRB2600 = {
 }
 
 TOLERANCE = 1
-SPEED = 0.5
+SPEED = 0.1
 
 
 def run(context) -> None:
@@ -49,8 +42,8 @@ def run(context) -> None:
             thetas = robot_cell.robots[0].kinematics.inverse_kinematics(target + [0.0, np.pi / 2, np.pi])
             robot_cell.drive([thetas], SPEED)
 
-        from time import sleep
-        sleep(2)
         robot_cell.launch(SPEED)
+
+        fusion_exit()
     except:
         print(f'Error\n{traceback.format_exc()}')

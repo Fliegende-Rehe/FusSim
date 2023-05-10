@@ -13,10 +13,6 @@ pip install sympy
 pip install openpyxl
 pip install setuptools
 
-pip uninstall click
-pip uninstall et-xmlfile
-pip uninstall colorama
-
 pip list
 
 deactivate

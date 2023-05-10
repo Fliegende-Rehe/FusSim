@@ -32,4 +32,3 @@ def get_orientation(transformation):
         sp.acos(rot_matrix[2, 2]),
         sp.atan2(rot_matrix[1, 2], -rot_matrix[0, 2])
     ])
-

@@ -106,4 +106,4 @@ def logger(msg, time_tag=True):
 
 
 def rounded(arr):
-    return ['{:.3f}'.format(el) for el in arr]
+    return ['{:.2f}'.format(el) for el in arr]

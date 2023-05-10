@@ -1,9 +1,8 @@
 from numpy import pi
 from sympy.physics.mechanics import dynamicsymbols
 
-from matrix_utils import *
-from robot.link import *
-# from .jacobian_cython import *
+from .matrix_utils import *
+from model.link import *
 
 
 class Kinematics:
@@ -13,7 +12,6 @@ class Kinematics:
 
         position = get_position(ee_frame)
         orientation = get_orientation(ee_frame)
-        # distance = compute_jacobian(thetas, position)
         distance = position.jacobian(thetas)
         angle = orientation.jacobian(thetas)
 

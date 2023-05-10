@@ -1,7 +1,6 @@
 from asyncio import create_task, gather
 
-from kinematics.kinematics import *
-
+from agla.kinematics import *
 
 class Robot:
     def __init__(self, body, constraints) -> None:

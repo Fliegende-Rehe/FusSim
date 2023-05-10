@@ -1,9 +1,9 @@
 from asyncio import run
 
-from robot import *
-from part import *
+from .robot import *
+from .part import *
 
-SPEED = 0.5
+SPEED = 0.1
 
 
 class RoboticCell:

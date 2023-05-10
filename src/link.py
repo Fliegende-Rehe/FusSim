@@ -1,5 +1,7 @@
-from math import radians, degrees
+from math import radians
 from random import uniform
+
+import numpy as np
 
 from .fusion import *
 
@@ -39,11 +41,11 @@ class Link:
     async def set_position(self, target_angle: float) -> None:
         self.joint.isLocked = False
         while not self.joint.isLocked:
-            self.joint.jointMotion.rotationValue = radians(target_angle) * self.direction
+            self.joint.jointMotion.rotationValue = target_angle * self.direction
             self.joint.isLocked = True
 
     def get_position(self) -> float:
-        return degrees(self.joint.jointMotion.rotationValue) * self.direction
+        return self.joint.jointMotion.rotationValue * self.direction
 
     def get_random_position(self) -> float:
-        return uniform(self.min, self.max)
+        return np.deg2rad(uniform(self.min, self.max))

@@ -101,9 +101,9 @@ def messenger(msg, error=True):
 
 def logger(msg, time_tag=True):
     msg = msg if isinstance(msg, str) else str(msg)
-    msg = f'[{datetime.now().strftime("%H:%M:%S")}] {msg}' if time_tag else msg
-    APP.log(msg)
+    msg = f'[{datetime.now().strftime("%H:%M:%S")}] {msg} \n' if time_tag else msg
+    print(msg) # APP.log
 
 
 def rounded(arr):
-    return [int(el) for el in arr]
+    return ['{:.2f}'.format(el) for el in arr]

@@ -8,49 +8,37 @@ from .link import *
 class Kinematics:
     def __init__(self, links, dh_table):
         thetas = dynamicsymbols('theta0:{}'.format(len(links)))
-
         ee_frame = ee_transformation(thetas, dh_table)
+
         position = get_position(ee_frame)
         orientation = get_orientation(ee_frame)
-
         distance = position.jacobian(thetas)
         angle = orientation.jacobian(thetas)
-        jacobian = distance.col_join(angle)
 
-        self.position = sp.lambdify(thetas, position)
-        self.orientation = sp.lambdify(thetas, orientation)
-        self.jacobian = sp.lambdify(thetas, jacobian)
+        self.forward = sp.lambdify(thetas, position.col_join(orientation))
+        self.jacobian = sp.lambdify(thetas, distance.col_join(angle))
 
         self.dh_table = dh_table
         self.links = links
 
-    def forward_kinematics(self, theta=None, deg=True) -> np.ndarray:
+    def forward_kinematics(self, theta=None):
         if theta is None:
             theta = self.get_links_position()
 
-        theta = np.array([(np.deg2rad(tar) if deg else tar) for tar in theta], dtype=float)
+        return self.forward(*theta).T[0]
 
-        return np.concatenate([self.position(*theta), self.orientation(*theta)])
-
-    def compute_error(self, qi, target):
-        position = sp.Matrix(target[:3] - self.position(*qi))
-        orientation = sp.Matrix(target[3:] - self.orientation(*qi))
-        error = position.col_join(orientation)
-        distance = sp.sqrt(position.dot(position)).evalf()
-        return distance, error
-
-    def inverse_kinematics(self, target, dt=0.01, min_distance=0.1):
+    def inverse_kinematics(self, target, dt=0.1, difference=0.1):
         target = np.array(target, dtype=float)
-        qi = np.array(self.get_links_position(False), dtype=float)
-        distance, error = self.compute_error(qi, target)
-        while distance > min_distance:
-            Jinv = sp.Matrix(np.linalg.pinv(self.jacobian(*qi)))
-            qi = qi + np.array((dt * Jinv * error).evalf().T.tolist()[0], dtype=float)
-            distance, error = self.compute_error(qi, target)
-        return np.rad2deg(qi)
+        thetas = self.get_links_position()
+        error = target - self.forward_kinematics()
+        while any(abs(element) > difference for element in error):
+            inverse_jacobian = np.linalg.pinv(self.jacobian(*thetas))
+            thetas = thetas + inverse_jacobian @ error * dt
+            error = target - self.forward_kinematics(thetas)
 
-    def get_links_position(self, deg=True) -> list[float]:
-        if deg:
-            return [link.get_position() for link in self.links]
-        else:
-            return [np.deg2rad(link.get_position()) for link in self.links]
+        ik_solution = (thetas % (2 * np.pi))
+        ik_solution = np.where(ik_solution > np.pi, ik_solution - (2 * np.pi), ik_solution)
+        return ik_solution.tolist()
+
+    def get_links_position(self):
+        return np.array([link.get_position() for link in self.links], dtype=float)

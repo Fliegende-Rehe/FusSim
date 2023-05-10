@@ -1,5 +1,4 @@
 import sympy as sp
-import numpy as np
 
 
 def ee_transformation(angles, dh_table, frame=sp.eye(4)):
@@ -22,6 +21,10 @@ def transformation_matrix(alpha, length, theta, offset):
     ])
 
 
+def get_position(transformation):
+    return transformation[:3, 3]
+
+
 def get_orientation(transformation):
     rot_matrix = transformation[:3, :3]
     return sp.Matrix([
@@ -29,7 +32,3 @@ def get_orientation(transformation):
         sp.acos(rot_matrix[2, 2]),
         sp.atan2(rot_matrix[1, 2], -rot_matrix[0, 2])
     ])
-
-
-def get_position(transformation):
-    return sp.Matrix(transformation[:3, 3])

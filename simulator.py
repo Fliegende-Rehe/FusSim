@@ -7,8 +7,6 @@ if EXTERNAL_MODULES_PATH not in path:
     path.append(EXTERNAL_MODULES_PATH)
 
 # actual code
-import traceback
-
 from .src.robotic_cell import *
 
 PROJECT_NAME = 'gets'
@@ -32,7 +30,7 @@ ABB_IRB2600 = {
 }
 
 TOLERANCE = 1
-SPEED = 10
+SPEED = 0.25
 
 
 def run(context) -> None:
@@ -41,24 +39,22 @@ def run(context) -> None:
         assembly = fusion.get_assembly()
         robot_cell = RoboticCell(assembly, ABB_IRB2600)
 
-        kinematics = robot_cell.robots[0].kinematics
+        robot = robot_cell.robots[0]
+        kinematics = robot.kinematics
 
-        ang = [-50] * 6
-        forward = kinematics.forward_kinematics(ang)
-        logger(f'Forward kinematics: \n'
-              f'input {ang} deg \n'
-              f'output {rounded(forward)} \n')
+        for _ in range(5):
+            ang =  robot.get_random_angles()
+            forward = kinematics.forward_kinematics(ang)
+            inverse = kinematics.inverse_kinematics(forward)
+            logger(f'Check: \n'
+                   f'target is {rounded(forward)} \n'
+                   f'result is {rounded(kinematics.forward_kinematics(inverse))} \n'
+                   f'with {rounded(np.rad2deg(inverse))} rad \n'
+                   )
 
-        inverse = kinematics.inverse_kinematics(forward)
-        logger(f'Inverse kinematics: \n'
-              f'input {rounded(forward)} \n'
-              f'output {rounded(inverse)} deg \n')
+            robot_cell.drive([inverse], SPEED)
 
-        logger(f'Check: \n'
-              f'IK = {rounded(inverse)} deg \n'
-              f'FK = {rounded(kinematics.forward_kinematics(inverse))} \n')
+        fusion_exit()
 
-        robot_cell.drive([inverse], SPEED)
-
-    except:
-        messenger(f'Runtime error\n{traceback.format_exc()}')
+    except Exception as e:
+        messenger(f'Runtime error\n{e}')

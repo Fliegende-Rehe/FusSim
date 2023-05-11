@@ -5,10 +5,9 @@ from sys import exit
 import adsk.core
 import adsk.fusion
 
-EXTERNAL_MODULES_PATH = 'C:\\fusion\\py39_fusion\\Lib\\site-packages'
-
 APP = adsk.core.Application.get()
 DESIGN = adsk.fusion.Design
+UI = adsk.core.UserInterface
 
 DELAY_TO_OPEN_FILE = 2
 
@@ -34,7 +33,8 @@ class Fusion:
     def set_assembly(self):
         if self.file_name not in APP.activeDocument.name:
             self.open_assembly()
-        logger('\n\nNew session logs:', False)
+        logger('\n' * 60, False)
+        logger('New session logs:\n\n', False)
         root = DESIGN.cast(APP.activeProduct).rootComponent
 
         return Assembly([occ.component for occ in root.occurrences.asList], root)
@@ -64,7 +64,8 @@ class Assembly:
         self.root = root
 
     def get_component_origin(self, component):
-        origin = self.root.allOccurrencesByComponent(component).item(0).transform.getAsCoordinateSystem()[0].asArray()
+        main_component = self.root.allOccurrencesByComponent(component).item(0)
+        origin = main_component.transform.getAsCoordinateSystem()[0].asArray()
         return [cord * 10 for cord in origin]
 
     def get_components(self):
@@ -81,7 +82,7 @@ class Assembly:
 
 
 def fusion_exit(kill=False):
-    logger('Terminate session')
+    logger('Terminate session.', False)
     if kill:
         exit()
 
@@ -96,7 +97,7 @@ def messenger(msg, error=True):
     if not isinstance(msg, str):
         msg = str(msg)
     title = 'Error' if error else 'Log'
-    print(f'{title}: {msg}')
+    UI.messageBox(f'{title}: {msg}')
 
 
 def logger(msg, time_tag=True):

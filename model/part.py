@@ -10,13 +10,13 @@ class Part:
         trajectories_spline = trajectories_sketch.sketchCurves.sketchFittedSplines
         self.trajectories = [Trajectory(spline, tolerance) for spline in trajectories_spline]
         self.assembly = assembly
-        self.update_trajectories()
+        self.sey_to_world()
 
     def get_origin(self):
         return self.assembly.get_component_origin(self.body)
 
-    def update_trajectories(self) -> list[Trajectory]:
+    def sey_to_world(self) -> list[Trajectory]:
         origin = self.get_origin()
         for tr in self.trajectories:
-            tr.update_points(origin)
+            tr.offset_points(origin)
         return self.trajectories

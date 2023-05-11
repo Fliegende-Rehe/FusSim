@@ -14,9 +14,11 @@ class Kinematics:
         orientation = get_orientation(ee_frame)
         distance = position.jacobian(thetas)
         angle = orientation.jacobian(thetas)
+        print('Jacobian is done')
 
         self.forward = sp.lambdify(thetas, position.col_join(orientation))
         self.jacobian = sp.lambdify(thetas, distance.col_join(angle))
+        print('Lambdify is done')
 
         self.dh_table = dh_table
         self.links = links
@@ -35,6 +37,8 @@ class Kinematics:
             inverse_jacobian = np.linalg.pinv(self.jacobian(*thetas))
             thetas = thetas + inverse_jacobian @ error * dt
             error = target - self.forward_kinematics(thetas)
+
+        logger(rounded(np.rad2deg(thetas)))
 
         ik_solution = (thetas % (2 * pi))
         ik_solution = np.where(ik_solution > pi, ik_solution - (2 * pi), ik_solution)

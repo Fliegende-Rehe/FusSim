@@ -29,4 +29,9 @@ class RoboticCell:
             await gather(*tasks)
 
         speeds = synchronize_robots_speed()
-        run(async_drive())
+
+        try:
+            run(async_drive())
+        except KeyboardInterrupt:
+            exit()
+

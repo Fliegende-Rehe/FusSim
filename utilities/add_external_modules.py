@@ -9,3 +9,5 @@ if EXTERNAL_MODULES_PATH not in sys.path:
 
 if ROOT_PATH not in sys.path:
     sys.path.append(ROOT_PATH)
+
+from model.robotic_cell import *

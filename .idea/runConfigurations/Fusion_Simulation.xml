@@ -3,7 +3,7 @@
     <module name="simulator" />
     <option name="script" value="C:\Workspace\simulator\simulator.py" />
     <option name="sdkHome" value="C:\Users\Admin\AppData\Local\Autodesk\webdeploy\production\b4885f4229f39fee5ad2bce82f309e671e5c9ccd\Python\python.exe" />
-    <option name="useModuleSdk" value="true" />
+    <option name="useModuleSdk" value="false" />
     <method v="2" />
   </configuration>
 </component>

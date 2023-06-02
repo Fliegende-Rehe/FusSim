@@ -3,7 +3,7 @@
   <component name="FacetManager">
     <facet type="fusion360plugin" name="Fusion 360 Support">
       <configuration>
-        <option name="fusionPath" value="C:\Users\Admin\AppData\Local\Autodesk\webdeploy\production\b4885f4229f39fee5ad2bce82f309e671e5c9ccd\Fusion360.exe" />
+        <option name="fusionPath" value="C:\Users\Admin\AppData\Local\Autodesk\webdeploy\production\a025d29cc566c591e9a766a22ab936c55abdd11a\Fusion360.exe" />
       </configuration>
     </facet>
   </component>
@@ -12,12 +12,12 @@
       <sourceFolder url="file://$MODULE_DIR$" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/venv" />
     </content>
-    <orderEntry type="jdk" jdkName="Simulator Interpreter" jdkType="Python SDK" />
+    <orderEntry type="jdk" jdkName="Python 3.9 (simulator)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module-library" scope="PROVIDED">
       <library name="Fusion 360 API" type="python">
         <CLASSES>
-          <root url="file://$USER_HOME$/AppData/Local/Autodesk/webdeploy/production/b4885f4229f39fee5ad2bce82f309e671e5c9ccd/Api/Python/packages/adsk/defs" />
+          <root url="file://$USER_HOME$/AppData/Local/Autodesk/webdeploy/production/a025d29cc566c591e9a766a22ab936c55abdd11a/Api/Python/packages/adsk/defs" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />

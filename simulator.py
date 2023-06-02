@@ -1,8 +1,6 @@
 import traceback
 
-import numpy as np
-
-from .utilities.add_external_modules import *
+from .src.add_external_modules import *
 
 PROJECT_NAME = 'gets'
 FILE_NAME = 'simulation'
@@ -25,8 +23,8 @@ ABB_IRB2600 = {
     ],
 }
 
-TOLERANCE = 2
-SPEED = 0.25
+TOLERANCE = 3
+SPEED = 0.5
 
 
 def run(context) -> None:
@@ -40,11 +38,9 @@ def run(context) -> None:
 
         for point in trajectory:
             inverse = robot_cell.robots[0].kinematics.inverse_kinematics(point + [0.0, np.pi / 2, np.pi])
-            logger(f'{rounded(np.rad2deg(inverse))}\n', False)
+            # robot_cell.drive([inverse], SPEED)
 
-            #robot_cell.drive([thetas.tolist()], SPEED)
-
-        robot_cell.launch(0.1)
+        robot_cell.launch(SPEED)
 
         fusion_exit()
     except:

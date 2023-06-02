@@ -1,8 +1,10 @@
-from numpy import pi
+# import cupy as cp
+
+from numpy import pi, sign
 from sympy.physics.mechanics import dynamicsymbols
 
 from .matrix_utils import *
-from model.link import *
+from .link import *
 
 
 class Kinematics:
@@ -12,13 +14,11 @@ class Kinematics:
 
         position = get_position(ee_frame)
         orientation = get_orientation(ee_frame)
-        distance = position.jacobian(thetas)
-        angle = orientation.jacobian(thetas)
-        print('Jacobian is done')
+        distance = position.jacobian(thetas)  # 6.5 sec
+        angle = orientation.jacobian(thetas)  # 6.5 sec
 
-        self.forward = sp.lambdify(thetas, position.col_join(orientation))
-        self.jacobian = sp.lambdify(thetas, distance.col_join(angle))
-        print('Lambdify is done')
+        self.forward = sp.lambdify(thetas, position.col_join(orientation))  # , "cupy")  # 1 sec
+        self.jacobian = sp.lambdify(thetas, distance.col_join(angle))  # , "cupy")  # 7 sec
 
         self.dh_table = dh_table
         self.links = links
@@ -27,22 +27,27 @@ class Kinematics:
         if theta is None:
             theta = self.get_links_position()
 
-        return self.forward(*theta).T[0]
+        return self.forward(*theta).T[0]  # cp.asnumpy()
 
     def inverse_kinematics(self, target, dt=0.1, difference=0.1):
-        target = np.array(target, dtype=float)
         thetas = self.get_links_position()
         error = target - self.forward_kinematics()
         while any(abs(element) > difference for element in error):
-            inverse_jacobian = np.linalg.pinv(self.jacobian(*thetas))
+            inverse_jacobian = np.linalg.pinv(self.jacobian(*thetas))  # cp.asnumpy()
             thetas = thetas + inverse_jacobian @ error * dt
             error = target - self.forward_kinematics(thetas)
 
-        logger(rounded(np.rad2deg(thetas)))
+        return self.process_angles(thetas)
 
-        ik_solution = (thetas % (2 * pi))
-        ik_solution = np.where(ik_solution > pi, ik_solution - (2 * pi), ik_solution)
-        return ik_solution.tolist()
+    def process_angles(self, thetas):
+        # logger(f'\n{rounded(np.rad2deg(thetas))}', False)
+        for i in range(len(thetas)):
+            while abs(thetas[i]) > 2 * pi:
+                thetas[i] -= sign(thetas[i]) * 2 * pi
+            if abs(thetas[i]) > pi:
+                thetas[i] = -(2 * pi * sign(thetas[i]) - thetas[i])
+        logger(f'\n{rounded(np.rad2deg(thetas))}\n', False)
+        return thetas
 
     def get_links_position(self):
         return np.array([link.get_position() for link in self.links], dtype=float)

@@ -1,4 +1,4 @@
-from utilities.fusion import *
+from .fusion import *
 
 
 class Trajectory:

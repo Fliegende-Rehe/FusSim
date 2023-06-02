@@ -1,9 +1,9 @@
+import adsk.core
+import adsk.fusion
+
 from datetime import datetime
 from time import sleep
 from sys import exit
-
-import adsk.core
-import adsk.fusion
 
 APP = adsk.core.Application.get()
 DESIGN = adsk.fusion.Design
@@ -33,8 +33,7 @@ class Fusion:
     def set_assembly(self):
         if self.file_name not in APP.activeDocument.name:
             self.open_assembly()
-        logger('\n' * 60, False)
-        logger('New session logs:\n\n', False)
+        logger('\n\nNew session logs:\n', False)
         root = DESIGN.cast(APP.activeProduct).rootComponent
 
         return Assembly([occ.component for occ in root.occurrences.asList], root)
@@ -82,7 +81,7 @@ class Assembly:
 
 
 def fusion_exit(kill=False):
-    logger('Terminate session.', False)
+    logger('Terminate session', False)
     if kill:
         exit()
 

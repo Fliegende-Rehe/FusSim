@@ -35,49 +35,33 @@ class RoboticCell:
 
         run(async_drive())
 
+    def supress_noises(self, ratio=4):
+        for col in range(len(self.position_chain[0])):
+            col_diff = []
+            for row in range(len(self.position_chain) - 1):
+                upper_row_diff = abs(self.position_chain[row][col] - self.position_chain[row + 1][col])
+                if row == 0:
+                    col_diff.append(upper_row_diff)
+                    continue
+
+                lower_row_diff = abs(self.position_chain[row - 1][col] - self.position_chain[row][col])
+                avg_diff = sum(col_diff) / len(col_diff)
+                if upper_row_diff > avg_diff * ratio and lower_row_diff > avg_diff * ratio:
+                    logger(
+                        f'[{row}][{col}]'
+                        f' = {np.round(np.rad2deg(self.position_chain[row][col]), decimals=2)}',
+                        False
+                    )
+                    self.position_chain[row][col] = self.position_chain[row - 1][col] + avg_diff
+                else:
+                    col_diff.append(upper_row_diff)
+
     def calculate_position_chain(self, target, orientation):
         for point in target:
             inverse = self.robots[0].kinematics.inverse_kinematics(point + orientation)
             self.position_chain.append(inverse)
 
-        # self.print_position_chain()
-        noise = [[] for _ in range(len(self.position_chain[0]))]
-        for col in range(len(self.position_chain[0])):
-            avg_diff = 0
-            for row in range(1, len(self.position_chain)):
-                diff = abs(self.position_chain[row][col] - self.position_chain[row - 1][col])
-                if row == 1:
-                    avg_diff = diff
-                    continue
-                if diff > avg_diff * 500:
-                    noise[col].append(self.position_chain[row][col])
-                else:
-                    avg_diff += diff
-                    avg_diff /= 2
-            logger(np.round(np.rad2deg(avg_diff), decimals=2))
-
-        for index in noise:
-            logger(np.round(np.rad2deg(index), False))
-
-        arr = rounded(np.rad2deg(np.array(self.position_chain).T[0]))
-        logger(sum(arr)/ len(arr))
-            # col_diff = []
-            # for row in range(1, len(self.position_chain)):
-            #     diff = abs(self.position_chain[row][col] - self.position_chain[row - 1][col])
-            #     col_diff.append(diff)
-            # noise_index = significantly_different_value_indexes(col_diff, std_multiplier=1.85)
-            # if len(noise_index) == 0:
-            #     continue
-            # for i in range(0, len(noise_index), 2):
-            #     row = int(noise_index[i]) + 1
-            #     logger(
-            #         f'chain [{row}][{col}]'
-            #         f' = {np.round(np.rad2deg(np.array(self.position_chain).T[col][row]), decimals=2)}',
-            #         False
-            #     )
-            #     self.position_chain[row][col] = (self.position_chain[row - 1][col] + self.position_chain[row + 1][
-            #         col]) / 2
-            # logger('\n', False)
+        self.supress_noises()
 
         self.print_position_chain()
 
@@ -85,13 +69,7 @@ class RoboticCell:
         self.drive([self.position_chain], speed)
 
     def print_position_chain(self):
+        logger('\n', False)
         for i, position in enumerate(self.position_chain, 0):
             logger(f'{i}) {rounded(np.rad2deg(position))}', False)
         logger('\n', False)
-
-
-def significantly_different_value_indexes(arr, std_multiplier):
-    data = np.array(arr)
-    mean = np.mean(data)
-    std_dev = np.std(data)
-    return [arr.index(x) for x in data if abs(x - mean) > std_multiplier * std_dev]  # arr.index(x)

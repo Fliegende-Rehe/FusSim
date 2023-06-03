@@ -35,35 +35,60 @@ class RoboticCell:
 
         run(async_drive())
 
-    def supress_noises(self, ratio=4):
+    def suppress_noises(self, ratio=4):
+        def round_deg(value):
+            return np.round(np.rad2deg(value), decimals=2)
+
+        def calculate_diff(row, col):
+            return abs(self.position_chain[row][col] - self.position_chain[row + 1][col])
+
+        def calculate_avg_diff(col_diff):
+            return sum(col_diff) / len(col_diff)
+
+        def update_wrong_values(wrong_index, row, col):
+            st = self.position_chain[wrong_index - 1][col]
+            fn = self.position_chain[row][col]
+            diff = (fn - st) / (row - wrong_index + 1)
+            for index in range(1, row - wrong_index + 1):
+                suppressed_value = self.position_chain[row - index][col]
+                self.position_chain[row - index][col] = fn - diff * index
+                logger(
+                    f'{round_deg(st)} ({round_deg(diff) * index})\n'
+                    f' {round_deg(self.position_chain[row - index][col])}'
+                    f' ({round_deg(suppressed_value)})\n'
+                    f' {round_deg(fn)}\n',
+                    False
+                )
+
         for col in range(len(self.position_chain[0])):
             col_diff = []
+            logger(f'Column {col}:', False)
+            wrong_index = None
             for row in range(len(self.position_chain) - 1):
-                upper_row_diff = abs(self.position_chain[row][col] - self.position_chain[row + 1][col])
+                upper_row_diff = calculate_diff(row, col)
                 if row == 0:
                     col_diff.append(upper_row_diff)
                     continue
 
-                lower_row_diff = abs(self.position_chain[row - 1][col] - self.position_chain[row][col])
-                avg_diff = sum(col_diff) / len(col_diff)
+                lower_row_diff = calculate_diff(row - 1, col)
+                avg_diff = calculate_avg_diff(col_diff)
                 if upper_row_diff > avg_diff * ratio and lower_row_diff > avg_diff * ratio:
-                    logger(
-                        f'[{row}][{col}]'
-                        f' = {np.round(np.rad2deg(self.position_chain[row][col]), decimals=2)}',
-                        False
-                    )
-                    self.position_chain[row][col] = self.position_chain[row - 1][col] + avg_diff
+                    if wrong_index is None:
+                        wrong_index = row
                 else:
+                    if wrong_index is not None:
+                        update_wrong_values(wrong_index, row, col)
                     col_diff.append(upper_row_diff)
+                    wrong_index = None
 
     def calculate_position_chain(self, target, orientation):
         for point in target:
             inverse = self.robots[0].kinematics.inverse_kinematics(point + orientation)
             self.position_chain.append(inverse)
 
-        self.supress_noises()
+        self.suppress_noises()
 
-        self.print_position_chain()
+        # self.print_position_chain()
 
     def process_position_chain(self, speed):
         self.drive([self.position_chain], speed)

@@ -23,7 +23,7 @@ ABB_IRB2600 = {
     ],
 }
 
-TOLERANCE = 3
+TOLERANCE = 1
 SPEED = 0.5
 
 
@@ -36,9 +36,9 @@ def run(context) -> None:
         part = Part(assembly, TOLERANCE)
         trajectory = part.trajectories[0].points
 
-        for point in trajectory:
-            inverse = robot_cell.robots[0].kinematics.inverse_kinematics(point + [0.0, np.pi / 2, np.pi])
-            # robot_cell.drive([inverse], SPEED)
+        orientation = [0.0, np.pi / 2, np.pi]
+        robot_cell.calculate_position_chain(trajectory, orientation)
+        # robot_cell.process_position_chain(SPEED)
 
         robot_cell.launch(SPEED)
 

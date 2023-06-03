@@ -81,7 +81,7 @@ class Assembly:
 
 
 def fusion_exit(kill=False):
-    logger('Terminate session', False)
+    logger('\nTerminate session', False)
     if kill:
         exit()
 

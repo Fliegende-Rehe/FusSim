@@ -27,14 +27,9 @@ class Link:
         limits.maximumValue = np.deg2rad(self.max if self.direction == 1 else abs(self.min))
         self.joint.isLocked = True
 
-    def get_limits(self, angle: float) -> bool:
+    def fit_limits(self, angle: float) -> bool:
         if self.min <= angle * self.direction <= self.max:
             return True
-        messenger(
-            f'Angle in beyond limits for {self.joint.name}\n'
-            f'angle: {angle}\n'
-            f'limit: ({self.min}, {self.max})\n'
-        )
         return False
 
     async def set_position(self, target_angle: float) -> None:

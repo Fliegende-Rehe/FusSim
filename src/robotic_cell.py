@@ -1,7 +1,5 @@
 from asyncio import run
 
-import numpy as np
-
 from .robot import *
 from .part import *
 
@@ -28,89 +26,19 @@ class RoboticCell:
             return [rng / drive_time if rng != 0 else 0 for rng in ranges]
 
         async def async_drive() -> None:
+            speeds = synchronize_robots_speed()
             tasks = [rbt.drive(tar, spd, home) for rbt, tar, spd in zip(self.robots, targets, speeds)]
-            await gather(*tasks)
-
-        speeds = synchronize_robots_speed()
+            await gather(*[create_task(task) for task in tasks])
 
         run(async_drive())
 
-    def suppress_noises(self, target, orientation, ratio=4):
-        for point in target:
-            inverse = self.robots[0].kinematics.inverse_kinematics(point + orientation)
-            self.position_chain.append(inverse)
-
-        def round_deg(value):
-            return np.round(np.rad2deg(value), decimals=2)
-
-        def calculate_diff(row, col):
-            return abs(self.position_chain[row][col] - self.position_chain[row + 1][col])
-
-        def calculate_avg_diff(col_diff):
-            return sum(col_diff) / len(col_diff)
-
-        def update_wrong_values(wrong_index, row, col):
-            st = self.position_chain[wrong_index - 1][col]
-            fn = self.position_chain[row][col]
-            diff = (fn - st) / (row - wrong_index + 1)
-            for index in range(1, row - wrong_index + 1):
-                suppressed_value = self.position_chain[row - index][col]
-                self.position_chain[row - index][col] = fn - diff * index
-                logger(
-                    f'{round_deg(st)} ({round_deg(diff) * index})\n'
-                    f' {round_deg(self.position_chain[row - index][col])}'
-                    f' ({round_deg(suppressed_value)})\n'
-                    f' {round_deg(fn)}\n',
-                    False
-                )
-
-        for col in range(len(self.position_chain[0])):
-            col_diff = []
-            logger(f'Column {col}:', False)
-            wrong_index = None
-            for row in range(len(self.position_chain) - 1):
-                upper_row_diff = calculate_diff(row, col)
-                if row == 0:
-                    col_diff.append(upper_row_diff)
-                    continue
-
-                lower_row_diff = calculate_diff(row - 1, col)
-                avg_diff = calculate_avg_diff(col_diff)
-                if upper_row_diff > avg_diff * ratio and lower_row_diff > avg_diff * ratio:
-                    if wrong_index is None:
-                        wrong_index = row
-                else:
-                    if wrong_index is not None:
-                        update_wrong_values(wrong_index, row, col)
-                    col_diff.append(upper_row_diff)
-                    wrong_index = None
-
-    def mirror_noises(self, target, orientation):
-        spacer = 2
-        if len(target) % 2 == 0:
-            spacer = 1
-
-        for index in range(len(target) // 2 + spacer):
-            inverse = self.robots[0].kinematics.inverse_kinematics(target[index] + orientation)
-            self.position_chain.append(inverse)
-
-        signs = []
-        for value in self.position_chain[-1]:
-            signs.append(np.sign(value))
-
-        for index in range(len(target) // 2):
-            inverse = []
-            for sign, value in zip(signs, self.position_chain[len(target) // 2 - index - 2]):
-                inverse.append(sign * abs(value))
-            self.position_chain.append(inverse)
-
     def calculate_position_chain(self, target, orientation):
-        self.mirror_noises(target, orientation)
-
-        # self.suppress_noises(target, orientation)
-
-        # for point in self.position_chain:
-        #     logger(rounded(np.rad2deg(point)), False)
+        self.position_chain = [
+            self.robots[0].kinematics.inverse_kinematics(target[index] + orientation)
+            for index in range(len(target))
+        ]
+        for pos in self.position_chain:
+            logger(rounded(np.rad2deg(pos)), False)
 
     def process_position_chain(self, speed):
         for position in self.position_chain:

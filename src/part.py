@@ -2,9 +2,6 @@ from .trajectory import *
 
 TOLERANCE = 0.5
 
-import adsk.core
-import adsk.fusion
-
 
 class Part:
     def __init__(self, assembly: Assembly, tolerance: float = TOLERANCE):

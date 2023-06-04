@@ -1,5 +1,4 @@
 from asyncio import create_task, gather
-
 from .kinematics import *
 
 
@@ -20,6 +19,7 @@ class Robot:
         return [abs(tar - cur) for tar, cur in zip(target, current)]
 
     async def drive(self, target: list[float], speed: float, home) -> None:
+
         def _synchronize_links_speed():
             ranges = self.get_drive_ranges(target)
             drive_time = self.get_drive_time(target, speed)
@@ -36,7 +36,7 @@ class Robot:
                         current[index] += rotation_direction * speeds[index]
                     else:
                         current[index] = tar
-                    if not link.get_limits(current[index]):
+                    if not link.fit_limits(current[index]):
                         fusion_exit(kill=True)
                     tasks.append(create_task(link.set_position(current[index])))
             await gather(*tasks)
@@ -46,6 +46,7 @@ class Robot:
         if all(spd == 0 for spd in speeds):
             return
         link_is_ready = [False] * len(self.links)
+
         while not all(link_is_ready):
             await _async_drive()
             refresh_display()

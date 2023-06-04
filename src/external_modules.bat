@@ -13,6 +13,9 @@ pip install sympy
 pip install openpyxl
 pip install cupy-cuda12x
 pip install scipy
+pip install geomdl
+pip install matplotlib
+
 
 pip list
 

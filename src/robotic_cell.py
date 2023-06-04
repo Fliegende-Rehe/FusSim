@@ -70,10 +70,7 @@ class RoboticCell:
             for index in range(len(target))
         ]
 
-        self.suppress_noises()
-
-        # for pos in self.position_chain:
-        #     logger(rounded(np.rad2deg(pos)), False)
+        # self.suppress_noises()
 
     def process_position_chain(self, speed):
         for position in self.position_chain:

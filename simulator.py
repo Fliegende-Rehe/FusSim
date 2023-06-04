@@ -23,7 +23,7 @@ ABB_IRB2600 = {
     ],
 }
 
-TOLERANCE = 10
+TOLERANCE = 15
 SPEED = 0.5
 
 
@@ -36,11 +36,13 @@ def run(context) -> None:
         part = Part(assembly, TOLERANCE)
         trajectory = part.trajectory.points
 
-        orientation = [0.0, np.pi / 2, np.pi]
-        robot_cell.calculate_position_chain(trajectory, orientation)
-        robot_cell.process_position_chain(SPEED)
-
-        robot_cell.launch(SPEED)
+        for p in trajectory:
+            logger(p, False)
+        # orientation = [0.0, np.pi / 2, np.pi]
+        # robot_cell.calculate_position_chain(trajectory, orientation)
+        # robot_cell.process_position_chain(SPEED)
+        #
+        # robot_cell.launch(SPEED)
 
         fusion_exit()
     except:

@@ -4,7 +4,7 @@
     <option name="INTERPRETER_OPTIONS" value="" />
     <option name="WORKING_DIRECTORY" value="./" />
     <option name="PARENT_ENVS" value="true" />
-    <option name="SCRIPT_NAME" value="./external_modules.bat" />
+    <option name="SCRIPT_NAME" value="./src/external_modules.bat" />
     <option name="PARAMETERS" value="" />
     <method v="2" />
   </configuration>

@@ -21,7 +21,7 @@ class Trajectory:
             if isinstance(curve, adsk.fusion.SketchLine):
                 edges = interpolate_3D_points(edges, int(length / tolerance))
 
-            self.points.extend(edges[:-1])
+            self.points.extend(edges)
 
         self.points.sort(key=lambda col: col[1])
         logger(f'The trajectory is made up of {len(self.points)} points')

@@ -28,9 +28,7 @@ class Link:
         self.joint.isLocked = True
 
     def fit_limits(self, angle: float) -> bool:
-        if self.min <= angle * self.direction <= self.max:
-            return True
-        return False
+        return self.min <= angle * self.direction <= self.max
 
     async def set_position(self, target_angle: float) -> None:
         self.joint.isLocked = False

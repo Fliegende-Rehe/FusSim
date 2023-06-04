@@ -26,60 +26,37 @@ class Kinematics:
 
         return self.forward(*theta).T[0]
 
-    def inverse_kinematics_null_space(self, target, null_space_goal, weighting_matrix, dt=0.1, difference=0.1):
-        thetas = self.get_links_position()
-        error = target - self.forward_kinematics()
+    def inverse_kinematics(self, target_position: np.ndarray, time_step=0.1, tolerance=0.1, damping_factor=0.0075):
+        n_links = len(self.links)
+        current_positions = self.get_links_position()
+        error_vector = target_position - self.forward_kinematics()
+        delta_theta = np.zeros_like(current_positions)
 
-        while any(abs(element) > difference for element in error):
-            jacobian = self.jacobian(*thetas)
-            inverse_jacobian = np.linalg.pinv(jacobian)
-            null_space = np.eye(len(thetas)) - np.dot(inverse_jacobian, jacobian)
-            null_space_error = null_space_goal - thetas
-            thetas = thetas + inverse_jacobian @ error * dt + null_space @ weighting_matrix @ null_space_error * dt
+        while np.linalg.norm(error_vector) > tolerance:
+            J = self.jacobian(*current_positions)
+            JT = J.T
+            damping_matrix = np.eye(n_links) * damping_factor ** 2
+            JInv = np.linalg.inv(J @ JT + damping_matrix)
+            pseudo_inverse_jacobian = JT @ JInv
+            delta_theta[:] = pseudo_inverse_jacobian @ error_vector * time_step
 
             for i, link in enumerate(self.links):
-                if not link.fit_limits(thetas[i]):
-                    thetas[i] = link.min if thetas[i] * link.direction < link.min else link.max
+                proposed_theta = current_positions[i] + delta_theta[i]
+                if link.fit_limits(proposed_theta):
+                    continue
+                delta_theta[i] = link.min if proposed_theta < link.min else link.max
+                delta_theta[i] -= current_positions[i]
 
-            error = target - self.forward_kinematics(thetas)
+            current_positions += delta_theta
+            error_vector = target_position - self.forward_kinematics(current_positions)
 
-        return angles_postprocessing(thetas)
+        return self.angles_postprocessing(current_positions)
 
-    def inverse_kinematics_default(self, target, dt=0.1, difference=0.1):
-        thetas = self.get_links_position()
-        error = target - self.forward_kinematics()
-        while any(abs(element) > difference for element in error):
-            inverse_jacobian = np.linalg.pinv(self.jacobian(*thetas))
-            thetas = thetas + inverse_jacobian @ error * dt
-            for i, link in enumerate(self.links):
-                if not link.fit_limits(thetas[i]):
-                    thetas[i] = link.min if thetas[i] * link.direction < link.min else link.max
-            error = target - self.forward_kinematics(thetas)
-        return angles_postprocessing(thetas)
-
-    def inverse_kinematics(self, target, dt=0.1, difference=0.1, lambda_=0.0075):
-        thetas = self.get_links_position()
-        error = target - self.forward_kinematics()
-
-        while any(abs(element) > difference for element in error):
-            J = self.jacobian(*thetas)
-            JT = np.transpose(J)
-            damping_squared = np.eye(J.shape[0]) * (lambda_ ** 2)
-            inverse_jacobian = JT @ np.linalg.inv(J @ JT + damping_squared)
-
-            thetas = thetas + inverse_jacobian @ error * dt
-            for i, link in enumerate(self.links):
-                if not link.fit_limits(thetas[i]):
-                    thetas[i] = link.min if thetas[i] * link.direction < link.min else link.max
-            error = target - self.forward_kinematics(thetas)
-        return angles_postprocessing(thetas)
+    def angles_postprocessing(self, thetas):
+        thetas = np.remainder(thetas, 2 * np.pi)
+        over_pi = np.where(abs(thetas) > np.pi)
+        thetas[over_pi] -= np.sign(thetas[over_pi]) * 2 * np.pi
+        return thetas
 
     def get_links_position(self):
         return np.array([link.get_position() for link in self.links], dtype=float)
-
-
-def angles_postprocessing(thetas):
-    thetas = np.remainder(thetas, 2 * np.pi)
-    over_pi = np.where(abs(thetas) > np.pi)
-    thetas[over_pi] -= np.sign(thetas[over_pi]) * 2 * np.pi
-    return thetas

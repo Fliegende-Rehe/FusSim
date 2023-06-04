@@ -32,13 +32,48 @@ class RoboticCell:
 
         run(async_drive())
 
+    def suppress_noises(self, ratio=4):
+        def calculate_diff(row, col):
+            return abs(self.position_chain[row][col] - self.position_chain[row + 1][col])
+
+        def update_wrong_values(wrong_index, row, col):
+            st = self.position_chain[wrong_index - 1][col]
+            fn = self.position_chain[row][col]
+            diff = (fn - st) / (row - wrong_index + 1)
+            for index in range(1, row - wrong_index + 1):
+                suppressed_value = self.position_chain[row - index][col]
+                self.position_chain[row - index][col] = fn - diff * index
+
+        for col in range(len(self.position_chain[0])):
+            col_diff = []
+            wrong_index = None
+            for row in range(len(self.position_chain) - 1):
+                upper_row_diff = calculate_diff(row, col)
+                if row == 0:
+                    col_diff.append(upper_row_diff)
+                    continue
+
+                lower_row_diff = calculate_diff(row - 1, col)
+                avg_diff = sum(col_diff) / len(col_diff)
+                if upper_row_diff > avg_diff * ratio and lower_row_diff > avg_diff * ratio:
+                    if wrong_index is None:
+                        wrong_index = row
+                else:
+                    if wrong_index is not None:
+                        update_wrong_values(wrong_index, row, col)
+                    col_diff.append(upper_row_diff)
+                    wrong_index = None
+
     def calculate_position_chain(self, target, orientation):
         self.position_chain = [
             self.robots[0].kinematics.inverse_kinematics(target[index] + orientation)
             for index in range(len(target))
         ]
-        for pos in self.position_chain:
-            logger(rounded(np.rad2deg(pos)), False)
+
+        self.suppress_noises()
+
+        # for pos in self.position_chain:
+        #     logger(rounded(np.rad2deg(pos)), False)
 
     def process_position_chain(self, speed):
         for position in self.position_chain:

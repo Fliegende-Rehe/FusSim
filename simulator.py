@@ -38,9 +38,9 @@ def run(context) -> None:
 
         orientation = [0.0, np.pi / 2, np.pi]
         robot_cell.calculate_position_chain(trajectory, orientation)
-        # robot_cell.process_position_chain(SPEED)
-        #
-        # robot_cell.launch(SPEED)
+        robot_cell.process_position_chain(SPEED)
+
+        robot_cell.launch(SPEED)
 
         fusion_exit()
     except:

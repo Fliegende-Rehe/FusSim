@@ -51,7 +51,7 @@ class Robot:
             refresh_display()
 
         position = rounded(self.kinematics.forward_kinematics(current))
-        logger(f'|{self.name}| moved to ' + ('home' if home else str(position)))
+        logger(f'|{self.name}| moved to ' + ('home' if home else str(position)), False)
 
     def get_random_angles(self) -> list[float]:
         return [link.get_random_position() for link in self.links]

@@ -1,5 +1,3 @@
-import numpy as np
-from scipy import stats
 from asyncio import run
 
 from .robot import *
@@ -35,9 +33,7 @@ class RoboticCell:
 
         run(async_drive())
 
-    def suppress_noises(self, ratio=4):
-        def round_deg(value):
-            return np.round(np.rad2deg(value), decimals=2)
+    def suppress_noises(self, ratio=3):
 
         def calculate_diff(row, col):
             return abs(self.position_chain[row][col] - self.position_chain[row + 1][col])
@@ -50,19 +46,10 @@ class RoboticCell:
             fn = self.position_chain[row][col]
             diff = (fn - st) / (row - wrong_index + 1)
             for index in range(1, row - wrong_index + 1):
-                suppressed_value = self.position_chain[row - index][col]
                 self.position_chain[row - index][col] = fn - diff * index
-                logger(
-                    f'{round_deg(st)} ({round_deg(diff) * index})\n'
-                    f' {round_deg(self.position_chain[row - index][col])}'
-                    f' ({round_deg(suppressed_value)})\n'
-                    f' {round_deg(fn)}\n',
-                    False
-                )
 
         for col in range(len(self.position_chain[0])):
             col_diff = []
-            logger(f'Column {col}:', False)
             wrong_index = None
             for row in range(len(self.position_chain) - 1):
                 upper_row_diff = calculate_diff(row, col)
@@ -88,13 +75,7 @@ class RoboticCell:
 
         self.suppress_noises()
 
-        # self.print_position_chain()
-
     def process_position_chain(self, speed):
-        self.drive([self.position_chain], speed)
-
-    def print_position_chain(self):
-        logger('\n', False)
-        for i, position in enumerate(self.position_chain, 0):
-            logger(f'{i}) {rounded(np.rad2deg(position))}', False)
-        logger('\n', False)
+        for position in self.position_chain:
+            self.drive([position], speed)
+        logger(f'The trajectory is done')

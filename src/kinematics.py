@@ -1,4 +1,3 @@
-import numpy as np
 from sympy.physics.mechanics import dynamicsymbols
 
 from .matrix_utils import *

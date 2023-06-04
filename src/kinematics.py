@@ -26,6 +26,25 @@ class Kinematics:
 
         return self.forward(*theta).T[0]
 
+    def inverse_kinematics_null_space(self, target, null_space_goal, weighting_matrix, dt=0.1, difference=0.1):
+        thetas = self.get_links_position()
+        error = target - self.forward_kinematics()
+
+        while any(abs(element) > difference for element in error):
+            jacobian = self.jacobian(*thetas)
+            inverse_jacobian = np.linalg.pinv(jacobian)
+            null_space = np.eye(len(thetas)) - np.dot(inverse_jacobian, jacobian)
+            null_space_error = null_space_goal - thetas
+            thetas = thetas + inverse_jacobian @ error * dt + null_space @ weighting_matrix @ null_space_error * dt
+
+            for i, link in enumerate(self.links):
+                if not link.fit_limits(thetas[i]):
+                    thetas[i] = link.min if thetas[i] * link.direction < link.min else link.max
+
+            error = target - self.forward_kinematics(thetas)
+
+        return angles_postprocessing(thetas)
+
     def inverse_kinematics_default(self, target, dt=0.1, difference=0.1):
         thetas = self.get_links_position()
         error = target - self.forward_kinematics()

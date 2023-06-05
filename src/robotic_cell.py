@@ -65,12 +65,23 @@ class RoboticCell:
                     wrong_index = None
 
     def calculate_position_chain(self, target, orientation):
-        self.position_chain = [
-            self.robots[0].kinematics.inverse_kinematics(target[index] + orientation)
-            for index in range(len(target))
-        ]
+        robot = self.robots[0]
+
+        theta = robot.get_links_position()
+        for tar in target:
+            position = robot.kinematics.inverse_kinematics(theta, tar + orientation)
+            self.position_chain.append(position)
+            theta = position
+
+        # self.position_chain = [
+        #     robot.kinematics.inverse_kinematics(theta, target[index] + orientation)
+        #     for index in range(len(target))
+        # ]
 
         # self.suppress_noises()
+
+        for p in self.position_chain:
+            logger(rounded(np.rad2deg(p)), False)
 
     def process_position_chain(self, speed):
         for position in self.position_chain:

@@ -11,11 +11,11 @@ class Robot:
         logger(f'[{self.name}] is ready')
 
     def get_drive_time(self, target: list[float], speed: float) -> float:
-        max_range = max(abs(tar - cur) for tar, cur in zip(target, self.kinematics.get_links_position()))
+        max_range = max(abs(tar - cur) for tar, cur in zip(target, self.get_links_position()))
         return max_range / speed if max_range != 0 else 0
 
     def get_drive_ranges(self, target: list[float]) -> list[float]:
-        current = self.kinematics.get_links_position()
+        current = self.get_links_position()
         return [abs(tar - cur) for tar, cur in zip(target, current)]
 
     async def drive(self, target: list[float], speed: float, home) -> None:
@@ -41,7 +41,7 @@ class Robot:
                     tasks.append(create_task(link.set_position(current[index])))
             await gather(*tasks)
 
-        current = self.kinematics.get_links_position()
+        current = self.get_links_position()
         speeds = _synchronize_links_speed()
         if all(spd == 0 for spd in speeds):
             return
@@ -56,3 +56,6 @@ class Robot:
 
     def get_random_angles(self) -> list[float]:
         return [link.get_random_position() for link in self.links]
+
+    def get_links_position(self):
+        return np.array([link.get_position() for link in self.links], dtype=float)

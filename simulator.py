@@ -23,7 +23,7 @@ ABB_IRB2600 = {
     ],
 }
 
-TOLERANCE = 15
+TOLERANCE = 0.01  # 12
 SPEED = 0.5
 
 
@@ -38,6 +38,7 @@ def run(context) -> None:
 
         for p in trajectory:
             logger(p, False)
+
         # orientation = [0.0, np.pi / 2, np.pi]
         # robot_cell.calculate_position_chain(trajectory, orientation)
         # robot_cell.process_position_chain(SPEED)

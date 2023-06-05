@@ -20,46 +20,47 @@ class Kinematics:
         self.dh_table = dh_table
         self.links = links
 
-    def forward_kinematics(self, theta=None):
-        if theta is None:
-            theta = self.get_links_position()
-
+    def forward_kinematics(self, theta):
         return self.forward(*theta).T[0]
 
-    def inverse_kinematics(self, target_position: np.ndarray, time_step=0.1, tolerance=0.05, damping_factor=0.0075):
-        n_links = len(self.links)
-        current_positions = self.get_links_position()
-        forward_kinematics_result = self.forward_kinematics()
-
-        error_vector = target_position - forward_kinematics_result
-        delta_theta = np.zeros_like(current_positions)
-
-        while np.linalg.norm(error_vector) > tolerance:
-            J = self.jacobian(*current_positions)
-            JT = J.T
-            damping_matrix = np.eye(n_links) * damping_factor ** 2
-            JInv = np.linalg.inv(J @ JT + damping_matrix)
-            pseudo_inverse_jacobian = JT @ JInv
-            delta_theta[:] = pseudo_inverse_jacobian @ error_vector * time_step
-
-            proposed_theta = current_positions + delta_theta
+    def inverse_kinematics(self, thetas, target, dt=0.1, difference=0.1):
+        error = target - self.forward_kinematics(thetas)
+        while any(abs(element) > difference for element in error):
+            inverse_jacobian = np.linalg.pinv(self.jacobian(*thetas))
+            thetas = thetas + inverse_jacobian @ error * dt
             for i, link in enumerate(self.links):
-                if link.fit_limits(proposed_theta[i]):
-                    continue
-                delta_theta[i] = link.min if proposed_theta[i] < link.min else link.max
-                delta_theta[i] -= current_positions[i]
+                if not link.fit_limits(thetas[i]):
+                    thetas[i] = link.min if thetas[i] * link.direction < link.min else link.max
+            error = target - self.forward_kinematics(thetas)
+        return angles_postprocessing(thetas)
 
-            current_positions += delta_theta
-            forward_kinematics_result = self.forward_kinematics(current_positions)
-            error_vector = target_position - forward_kinematics_result
+    # def inverse_kinematics(self, theta, target, time_step=0.1, tolerance=0.05, damping_factor=0.0075):
+    #     error_vector = target - self.forward_kinematics(theta)
+    #     delta_theta = np.zeros_like(theta)
+    #
+    #     while np.linalg.norm(error_vector) > tolerance:
+    #         J = self.jacobian(*theta)
+    #         JT = J.T
+    #         damping_matrix = np.eye(len(self.links)) * damping_factor ** 2
+    #         JInv = np.linalg.inv(J @ JT + damping_matrix)
+    #         pseudo_inverse_jacobian = JT @ JInv
+    #         delta_theta[:] = pseudo_inverse_jacobian @ error_vector * time_step
+    #
+    #         proposed_theta = theta + delta_theta
+    #         for i, link in enumerate(self.links):
+    #             if link.fit_limits(proposed_theta[i]):
+    #                 continue
+    #             delta_theta[i] = link.min if proposed_theta[i] < link.min else link.max
+    #             delta_theta[i] -= theta[i]
+    #
+    #         theta += delta_theta
+    #         error_vector = target - self.forward_kinematics(theta)
+    #
+    #     return self.angles_postprocessing(theta)
 
-        return self.angles_postprocessing(current_positions)
 
-    def angles_postprocessing(self, thetas):
-        thetas = np.remainder(thetas, 2 * np.pi)
-        over_pi = np.where(abs(thetas) > np.pi)
-        thetas[over_pi] -= np.sign(thetas[over_pi]) * 2 * np.pi
-        return thetas
-
-    def get_links_position(self):
-        return np.array([link.get_position() for link in self.links], dtype=float)
+def angles_postprocessing(thetas):
+    thetas = np.remainder(thetas, 2 * np.pi)
+    over_pi = np.where(abs(thetas) > np.pi)
+    thetas[over_pi] -= np.sign(thetas[over_pi]) * 2 * np.pi
+    return thetas
